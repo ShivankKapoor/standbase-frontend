@@ -1,0 +1,101 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: system-ui, 'Segoe UI', sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Light mode — primary: Gulf Blue #7BB5DC, secondary: Gulf Orange #FF6319 */
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(222, 84%, 5%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222, 84%, 5%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222, 84%, 5%);
+  --primary: hsl(204, 57%, 66%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222, 47%, 11%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --accent: hsl(210, 40%, 94%);
+  --accent-foreground: hsl(222, 47%, 11%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --ring: hsl(204, 57%, 66%);
+  --radius: 0.5rem;
+}
+
+/* Dark mode — primary: Gulf Orange #FF6319, secondary: Gulf Blue */
+.dark {
+  --background: hsl(0, 0%, 8%);
+  --foreground: hsl(0, 0%, 95%);
+  --card: hsl(0, 0%, 11%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --popover: hsl(0, 0%, 11%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --primary: hsl(19, 100%, 55%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(0, 0%, 16%);
+  --secondary-foreground: hsl(0, 0%, 95%);
+  --muted: hsl(0, 0%, 16%);
+  --muted-foreground: hsl(0, 0%, 60%);
+  --accent: hsl(0, 0%, 16%);
+  --accent-foreground: hsl(0, 0%, 95%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(0, 0%, 18%);
+  --input: hsl(0, 0%, 18%);
+  --ring: hsl(19, 100%, 55%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    margin: 0;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
