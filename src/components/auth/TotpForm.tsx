@@ -144,7 +144,7 @@ export function TotpForm({ preAuthToken, onSuccess, onBack }: TotpFormProps) {
       <Button type="submit" className="w-full" disabled={loading || code.length !== 6}>
         {loading ? 'Verifying…' : 'Verify'}
       </Button>
-      <Button type="button" variant="ghost" className="w-full" onClick={onBack}>
+      <Button type="button" variant="ghost" className="w-full" onClick={() => onBack()}>
         Back
       </Button>
     </form>

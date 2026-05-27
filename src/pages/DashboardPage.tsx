@@ -65,7 +65,7 @@ export function DashboardPage() {
 
       <div className="flex flex-1">
         <main className="flex-1">
-          <div className="mx-auto max-w-5xl px-4 py-6 pb-16">
+          <div className="mx-auto max-w-7xl px-4 py-6 pb-16">
             <MonthCalendar
               year={year}
               month={month}

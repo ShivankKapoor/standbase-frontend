@@ -69,7 +69,7 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
           if (!day) {
             const col = i % 7;
             const emptyWeekend = col === 0 || col === 6;
-            return <div key={i} className={`min-h-12 sm:min-h-28 ${emptyWeekend ? 'bg-muted/20' : 'bg-background'}`} />;
+            return <div key={i} className={`min-h-9 sm:min-h-20 lg:min-h-28 xl:min-h-32 ${emptyWeekend ? 'bg-muted/20' : 'bg-background'}`} />;
           }
           const date = toDateStr(year, month, day);
           const col = i % 7; // 0=Sun … 6=Sat
