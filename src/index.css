@@ -30,7 +30,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Light mode — primary: Gulf Blue #7BB5DC, secondary: Gulf Orange #FF6319 */
+/* Light mode — primary: Gulf Blue #192c76, secondary: Gulf Orange #FF6319 */
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(222, 84%, 5%);
@@ -38,7 +38,7 @@
   --card-foreground: hsl(222, 84%, 5%);
   --popover: hsl(0, 0%, 100%);
   --popover-foreground: hsl(222, 84%, 5%);
-  --primary: hsl(204, 57%, 66%);
+  --primary: hsl(228, 65%, 28%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(210, 40%, 96%);
   --secondary-foreground: hsl(222, 47%, 11%);
@@ -50,7 +50,7 @@
   --destructive-foreground: hsl(0, 0%, 100%);
   --border: hsl(214, 32%, 91%);
   --input: hsl(214, 32%, 91%);
-  --ring: hsl(204, 57%, 66%);
+  --ring: hsl(228, 65%, 28%);
   --radius: 0.5rem;
 }
 

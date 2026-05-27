@@ -5,17 +5,10 @@ import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { DayTypeBadge } from './DayTypeBadge';
 import { getEntry, createEntry, deleteEntry } from '../../api/entries';
 import type { DayType, EntryOverview } from '../../types';
-
-const DAY_TYPES: DayType[] = ['PTO', 'PLANNING', 'SUPPORT'];
-
-const dayTypeRing: Record<DayType, string> = {
-  PTO:      'ring-sky-500',
-  PLANNING: 'ring-violet-500',
-  SUPPORT:  'ring-amber-500',
-};
 
 interface EntryPanelProps {
   date: string;
@@ -98,31 +91,19 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
           <>
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">Day type</Label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setDayType(null)}
-                  className={[
-                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
-                    dayType === null
-                      ? 'border-foreground bg-foreground text-background'
-                      : 'border-border text-muted-foreground hover:border-foreground/50',
-                  ].join(' ')}
-                >
-                  None
-                </button>
-                {DAY_TYPES.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setDayType(t === dayType ? null : t)}
-                    className={[
-                      'rounded-full transition-all ring-offset-background',
-                      dayType === t ? `ring-2 ring-offset-1 ${dayTypeRing[t]}` : '',
-                    ].join(' ')}
-                  >
-                    <DayTypeBadge dayType={t} />
-                  </button>
-                ))}
-              </div>
+              <Select value={dayType ?? 'none'} onValueChange={(v) => setDayType(v === 'none' ? null : v as DayType)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue>
+                    {dayType ? <DayTypeBadge dayType={dayType} /> : <span className="text-muted-foreground">None</span>}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="PTO"><DayTypeBadge dayType="PTO" /></SelectItem>
+                  <SelectItem value="PLANNING"><DayTypeBadge dayType="PLANNING" /></SelectItem>
+                  <SelectItem value="SUPPORT"><DayTypeBadge dayType="SUPPORT" /></SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex flex-1 flex-col space-y-2">
