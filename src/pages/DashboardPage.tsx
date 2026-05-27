@@ -51,6 +51,14 @@ export function DashboardPage() {
     setPanelDate(null);
   }
 
+  function goToToday() {
+    const now = new Date();
+    setYear(now.getFullYear());
+    setMonth(now.getMonth() + 1);
+    setSelectedDate(null);
+    setPanelDate(null);
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
@@ -66,6 +74,7 @@ export function DashboardPage() {
               onSelectDate={setSelectedDate}
               onPrev={prevMonth}
               onNext={nextMonth}
+              onToday={goToToday}
             />
           </div>
         </main>

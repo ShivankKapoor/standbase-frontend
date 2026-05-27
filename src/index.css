@@ -99,3 +99,24 @@
 .animate-fade-in {
   animation: fade-in 0.2s ease-out;
 }
+
+/* OTP odometer — digit slides in from top, fades out downward on clear */
+@keyframes digit-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+@keyframes digit-out {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(100%); opacity: 0; }
+}
+.animate-digit-in  { animation: digit-in  0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.animate-digit-out { animation: digit-out 0.15s ease-in                          forwards; }
+
+@keyframes otp-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+.animate-otp-shake { animation: otp-shake 0.4s ease; }

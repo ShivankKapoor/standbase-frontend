@@ -14,13 +14,14 @@ interface MonthCalendarProps {
   onSelectDate: (date: string) => void;
   onPrev: () => void;
   onNext: () => void;
+  onToday: () => void;
 }
 
 function toDateStr(year: number, month: number, day: number): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate, onPrev, onNext }: MonthCalendarProps) {
+export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate, onPrev, onNext, onToday }: MonthCalendarProps) {
   const entryMap = new Map(entries.map((e) => [e.date, e.dayType]));
 
   const firstDay = new Date(year, month - 1, 1);
@@ -39,14 +40,19 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
   return (
     <div className="animate-fade-in">
       <div className="mb-4 flex items-center justify-between">
-        <Button variant="ghost" size="icon" onClick={onPrev}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={onPrev}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onNext}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
         <h2 className="text-base font-semibold">
           {format(firstDay, 'MMMM yyyy')}
         </h2>
-        <Button variant="ghost" size="icon" onClick={onNext}>
-          <ChevronRight className="h-4 w-4" />
+        <Button variant="outline" size="sm" className="text-xs" onClick={onToday}>
+          Today
         </Button>
       </div>
 

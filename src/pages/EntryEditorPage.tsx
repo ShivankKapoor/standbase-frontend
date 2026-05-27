@@ -12,6 +12,8 @@ import { DayTypeBadge } from '../components/entry/DayTypeBadge';
 import { getEntry, createEntry, deleteEntry } from '../api/entries';
 import type { DayType } from '../types';
 
+const STANDUP_TEMPLATE = `📆 What you did yesterday\n👉 What you are doing today\n🛑 Blockers preventing you from making progress`;
+
 export function EntryEditorPage() {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
@@ -105,7 +107,12 @@ export function EntryEditorPage() {
             </div>
 
             <div className="flex flex-1 flex-col space-y-2">
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground">Notes</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Notes</Label>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-muted-foreground" onClick={() => setContent(STANDUP_TEMPLATE)}>
+                  Apply Template
+                </Button>
+              </div>
               <Textarea
                 className="min-h-96 flex-1 resize-none font-mono text-sm"
                 placeholder="What did you work on?"
