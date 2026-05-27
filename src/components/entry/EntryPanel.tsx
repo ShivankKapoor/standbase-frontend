@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -18,6 +19,7 @@ interface EntryPanelProps {
 }
 
 export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps) {
+  const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [dayType, setDayType] = useState<DayType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,9 +78,14 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
             {format(parseISO(date), 'd MMMM yyyy')}
           </span>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`)} aria-label="Open full editor">
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-4">

@@ -109,7 +109,7 @@ export function DashboardPage() {
         </Drawer>
       )}
 
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors position="bottom-center" />
     </div>
   );
 }
