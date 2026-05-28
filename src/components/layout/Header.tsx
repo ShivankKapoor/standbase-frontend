@@ -10,7 +10,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <img src="/cal.svg" alt="" className="h-7 w-7" />
+          <img src="/cal.svg" alt="" className="h-9 w-9" />
           <span className="font-semibold tracking-tight">Standbase</span>
         </div>
         <div className="flex items-center gap-1">

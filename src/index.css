@@ -120,3 +120,10 @@
   80%       { transform: translateX(4px); }
 }
 .animate-otp-shake { animation: otp-shake 0.4s ease; }
+
+@keyframes theme-toggle-spin {
+  0%   { transform: rotate(0deg)   scale(1);   }
+  40%  { transform: rotate(180deg) scale(0.7); }
+  100% { transform: rotate(360deg) scale(1);   }
+}
+.animate-theme-spin { animation: theme-toggle-spin 0.4s ease; }
