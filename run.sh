@@ -6,7 +6,7 @@ CONTAINER_NAME="standbase-frontend"
 HOST_PORT="${PORT:-5555}"
 
 # Required — pass as env var or edit here
-API_URL="${VITE_API_URL:-https://standbase.shivankkapoor.com}"
+API_URL="${VITE_API_URL:-https://standapi.shivankkapoor.com}"
 
 echo "Building image (API URL: $API_URL) …"
 podman build \
