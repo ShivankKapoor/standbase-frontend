@@ -29,7 +29,7 @@ export function DashboardPage() {
     setClosing(true);
   }
 
-  function handleAnimationEnd() {
+  function handleTransitionEnd() {
     if (closing) {
       setSelectedDate(null);
       setPanelDate(null);
@@ -80,24 +80,24 @@ export function DashboardPage() {
         </main>
 
         {/* Desktop: side panel */}
-        {!isMobile && panelDate && (
+        {!isMobile && (
           <aside
             className={[
-              'w-80 shrink-0 border-l duration-200',
-              closing
-                ? 'animate-out slide-out-to-right fill-mode-forwards'
-                : 'animate-in slide-in-from-right',
+              'shrink-0 overflow-hidden border-l transition-[width] duration-200 ease-in-out',
+              panelDate && !closing ? 'w-80' : 'w-0',
             ].join(' ')}
-            onAnimationEnd={handleAnimationEnd}
+            onTransitionEnd={handleTransitionEnd}
           >
-            <div className="sticky top-14 h-[calc(100dvh-3.5rem)] w-full">
-              <EntryPanel
-                date={panelDate}
-                onClose={closePanel}
-                onSave={updateEntry}
-                onDelete={removeEntry}
-              />
-            </div>
+            {panelDate && (
+              <div className="sticky top-14 h-[calc(100dvh-3.5rem)] w-80">
+                <EntryPanel
+                  date={panelDate}
+                  onClose={closePanel}
+                  onSave={updateEntry}
+                  onDelete={removeEntry}
+                />
+              </div>
+            )}
           </aside>
         )}
       </div>

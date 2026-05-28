@@ -27,6 +27,11 @@ export async function apiFetch<T>(
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
   if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem('session_token');
+      localStorage.removeItem('username');
+      window.location.replace('/login');
+    }
     const text = await res.text().catch(() => '');
     throw new ApiError(res.status, text || res.statusText);
   }
