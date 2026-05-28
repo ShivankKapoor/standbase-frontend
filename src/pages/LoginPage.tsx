@@ -20,14 +20,13 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <div className="flex justify-end p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="flex flex-1 items-center justify-center px-4">
-        <div className="w-full max-w-sm animate-fade-in space-y-6">
+      <div className="w-full max-w-sm -mt-10 animate-fade-in space-y-6">
           <div className="flex flex-col items-center gap-3">
-            <img src="/cal.svg" alt="Standbase" className="h-12 w-12" />
+            <img src="/cal.svg" alt="Standbase" className="h-20 w-20" />
             <div className="text-center">
               <h1 className="text-2xl font-bold tracking-tight">Standbase</h1>
               <p className="text-sm text-muted-foreground">
@@ -53,7 +52,6 @@ export function LoginPage() {
               />
             )}
           </div>
-        </div>
       </div>
       <Toaster richColors position="bottom-center" />
     </div>
