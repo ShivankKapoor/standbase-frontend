@@ -60,12 +60,12 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex h-dvh flex-col bg-background">
       <Header />
 
-      <div className="flex flex-1">
-        <main className="flex-1">
-          <div className="mx-auto max-w-7xl px-4 py-6 pb-16">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        <main className="flex flex-1 flex-col min-h-0">
+          <div className="flex flex-1 flex-col min-h-0 mx-auto w-full max-w-screen-2xl px-4 py-4">
             <MonthCalendar
               year={year}
               month={month}
@@ -90,7 +90,7 @@ export function DashboardPage() {
             ].join(' ')}
             onAnimationEnd={handleAnimationEnd}
           >
-            <div className="sticky top-14 h-[calc(100vh-3.5rem)] w-full">
+            <div className="sticky top-14 h-[calc(100dvh-3.5rem)] w-full">
               <EntryPanel
                 date={panelDate}
                 onClose={closePanel}
