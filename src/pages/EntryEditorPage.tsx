@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
@@ -17,14 +17,16 @@ const STANDUP_TEMPLATE = `📆 What you did yesterday\n👉 What you are doing t
 export function EntryEditorPage() {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const draft = state?.draft as { content: string; dayType: DayType | null } | undefined;
 
-  const [content, setContent] = useState('');
-  const [dayType, setDayType] = useState<DayType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState(draft?.content ?? '');
+  const [dayType, setDayType] = useState<DayType | null>(draft?.dayType ?? null);
+  const [loading, setLoading] = useState(!draft);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!date) return;
+    if (!date || draft) return;
     setLoading(true);
     getEntry(date)
       .then((entry) => {

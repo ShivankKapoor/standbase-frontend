@@ -81,7 +81,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`)} aria-label="Open full editor">
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`, { state: { draft: { content, dayType } } })} aria-label="Open full editor">
             <Maximize2 className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" onClick={onClose}>
