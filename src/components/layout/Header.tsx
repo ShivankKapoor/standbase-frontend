@@ -17,7 +17,7 @@ export function Header() {
           {username && (
             <span className="mr-2 text-sm text-muted-foreground">{username}</span>
           )}
-          <ThemeToggle />
+<ThemeToggle />
           <Button variant="ghost" size="icon" onClick={logout} aria-label="Logout">
             <LogOut className="h-4 w-4" />
           </Button>

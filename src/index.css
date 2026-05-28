@@ -86,6 +86,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     margin: 0;
+    font-family: 'Nunito', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
   }
