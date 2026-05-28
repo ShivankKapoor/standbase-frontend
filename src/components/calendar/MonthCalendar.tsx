@@ -38,7 +38,7 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
   while (cells.length % 7 !== 0) cells.push(null);
 
   return (
-    <div className="animate-fade-in">
+    <div className="flex flex-1 flex-col min-h-0 animate-fade-in">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" onClick={onPrev}>
@@ -64,18 +64,18 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-px border rounded-lg overflow-hidden bg-border">
+      <div className="grid flex-1 min-h-0 grid-cols-7 [grid-auto-rows:1fr] gap-px border rounded-lg overflow-hidden bg-border">
         {cells.map((day, i) => {
           if (!day) {
             const col = i % 7;
             const emptyWeekend = col === 0 || col === 6;
-            return <div key={i} className={`min-h-9 sm:min-h-20 lg:min-h-28 xl:min-h-32 ${emptyWeekend ? 'bg-muted/20' : 'bg-background'}`} />;
+            return <div key={i} className={emptyWeekend ? 'bg-muted/20' : 'bg-background'} />;
           }
           const date = toDateStr(year, month, day);
           const col = i % 7; // 0=Sun … 6=Sat
           const isWeekend = col === 0 || col === 6;
           return (
-            <div key={date} className={isWeekend ? 'bg-muted/20' : 'bg-background'}>
+            <div key={date} className={`h-full ${isWeekend ? 'bg-muted/20' : 'bg-background'}`}>
               <DayCell
                 day={day}
                 isToday={date === todayStr}

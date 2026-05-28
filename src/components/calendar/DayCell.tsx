@@ -26,7 +26,7 @@ export function DayCell({ day, isToday, isSelected, hasEntry, dayType, onClick }
     <button
       onClick={onClick}
       className={[
-        'group relative flex w-full min-h-9 sm:min-h-20 lg:min-h-28 xl:min-h-32 flex-col items-start p-1 sm:p-2 text-left transition-colors',
+        'group relative flex h-full w-full flex-col items-start p-1 sm:p-2 text-left transition-colors',
         isSelected ? 'bg-accent ring-2 ring-inset ring-primary' : 'hover:bg-accent/40',
       ].join(' ')}
     >
