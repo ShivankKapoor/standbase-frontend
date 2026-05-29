@@ -156,7 +156,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
                 </Button>
               </div>
               <Textarea
-                className="flex-1 resize-none font-mono text-sm min-h-48"
+                className="flex-1 resize-none text-sm min-h-48" style={{ fontFamily: "'IBM Plex Mono', monospace" }}
                 placeholder="What did you work on?"
                 maxLength={2000}
                 value={content}
