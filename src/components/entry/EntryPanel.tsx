@@ -7,6 +7,7 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DayTypeBadge } from './DayTypeBadge';
 import { getEntry, createEntry, deleteEntry } from '../../api/entries';
 import type { DayType, EntryOverview } from '../../types';
@@ -24,20 +25,42 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [dayType, setDayType] = useState<DayType | null>(null);
+  const [savedContent, setSavedContent] = useState('');
+  const [savedDayType, setSavedDayType] = useState<DayType | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showDiscard, setShowDiscard] = useState(false);
+  const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  const isDirty = content !== savedContent || dayType !== savedDayType;
+
+  function guardUnsaved(action: () => void) {
+    if (isDirty) {
+      setPendingAction(() => action);
+      setShowDiscard(true);
+    } else {
+      action();
+    }
+  }
 
   useEffect(() => {
     setLoading(true);
     getEntry(date)
       .then((entry) => {
-        setContent(entry.content ?? '');
-        setDayType(entry.dayType);
+        const c = entry.content ?? '';
+        const d = entry.dayType;
+        setContent(c);
+        setDayType(d);
+        setSavedContent(c);
+        setSavedDayType(d);
       })
       .catch((err) => {
         if (err.status === 404) {
           setContent('');
           setDayType(null);
+          setSavedContent('');
+          setSavedDayType(null);
         } else {
           toast.error('Failed to load entry');
         }
@@ -49,6 +72,8 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
     setSaving(true);
     try {
       await createEntry(date, content, dayType);
+      setSavedContent(content);
+      setSavedDayType(dayType);
       onSave(date, dayType);
       toast.success('Entry saved');
     } catch {
@@ -81,10 +106,10 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`, { state: { draft: { content, dayType } } })} aria-label="Open full editor">
+          <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`, { state: { draft: { content, dayType }, saved: { content: savedContent, dayType: savedDayType } } })} aria-label="Open full editor">
             <Maximize2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={() => guardUnsaved(onClose)}>
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -117,8 +142,16 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
 
             <div className="flex flex-1 flex-col space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground">Notes</Label>
-                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-muted-foreground" onClick={() => setContent(STANDUP_TEMPLATE)}>
+                <Label className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
+                  Notes
+                  {isDirty && (
+                    <>
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#FF6319]" />
+                      <span className="text-xs italic normal-case tracking-normal text-[#FF6319]">Unsaved</span>
+                    </>
+                  )}
+                </Label>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-muted-foreground" onClick={() => content.trim() ? setShowTemplateConfirm(true) : setContent(STANDUP_TEMPLATE)}>
                   Apply Template
                 </Button>
               </div>
@@ -141,15 +174,59 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
           size="sm"
           className="text-destructive hover:text-destructive hover:bg-destructive/10"
           onClick={handleDelete}
-          disabled={loading}
+          disabled={loading || savedContent === '' && savedDayType === null}
         >
           <Trash2 className="mr-1 h-3.5 w-3.5" />
           Delete
         </Button>
-        <Button size="sm" onClick={handleSave} disabled={saving || loading}>
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={saving || loading}
+          className={isDirty ? 'bg-[#FF6319] hover:bg-[#FF6319]/90 text-white' : ''}
+        >
           {saving ? 'Saving…' : 'Save'}
         </Button>
       </div>
+      <AlertDialog open={showTemplateConfirm} onOpenChange={setShowTemplateConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apply template?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will overwrite your existing notes. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={() => { setContent(STANDUP_TEMPLATE); setShowTemplateConfirm(false); }}
+            >
+              Overwrite
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDiscard} onOpenChange={setShowDiscard}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to discard them?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={() => { pendingAction?.(); setShowDiscard(false); }}
+            >
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
