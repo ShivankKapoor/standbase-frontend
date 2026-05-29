@@ -48,7 +48,7 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <h2 className="text-base font-semibold">
+        <h2 className="text-xl font-semibold">
           {format(firstDay, 'MMMM yyyy')}
         </h2>
         <Button variant="outline" size="sm" className="text-xs" onClick={onToday}>
@@ -66,20 +66,19 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
 
       <div className="grid flex-1 min-h-0 grid-cols-7 [grid-auto-rows:1fr] gap-px border rounded-lg overflow-hidden bg-border">
         {cells.map((day, i) => {
+          const col = i % 7;
+          const isWeekend = col === 0 || col === 6;
           if (!day) {
-            const col = i % 7;
-            const emptyWeekend = col === 0 || col === 6;
-            return <div key={i} className={emptyWeekend ? 'bg-muted/20' : 'bg-background'} />;
+            return <div key={i} className="bg-background" />;
           }
           const date = toDateStr(year, month, day);
-          const col = i % 7; // 0=Sun … 6=Sat
-          const isWeekend = col === 0 || col === 6;
           return (
-            <div key={date} className={`h-full ${isWeekend ? 'bg-muted/20' : 'bg-background'}`}>
+            <div key={date} className="h-full bg-background">
               <DayCell
                 day={day}
                 isToday={date === todayStr}
                 isSelected={date === selectedDate}
+                isWeekend={isWeekend}
                 hasEntry={entryMap.has(date)}
                 dayType={entryMap.get(date) ?? null}
                 onClick={() => onSelectDate(date)}
