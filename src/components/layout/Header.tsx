@@ -11,7 +11,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <img src="/cal.svg" alt="" className="h-9 w-9" />
-          <span className="font-semibold tracking-tight">Standbase</span>
+          <span className="text-lg font-semibold tracking-tight underline underline-offset-4">Standbase</span>
         </div>
         <div className="flex items-center gap-1">
           {username && (

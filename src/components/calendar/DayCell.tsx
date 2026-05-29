@@ -10,12 +10,13 @@ interface DayCellProps {
   day: number;
   isToday: boolean;
   isSelected: boolean;
+  isWeekend: boolean;
   hasEntry: boolean;
   dayType: DayType | null;
   onClick: () => void;
 }
 
-export function DayCell({ day, isToday, isSelected, hasEntry, dayType, onClick }: DayCellProps) {
+export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType, onClick }: DayCellProps) {
   const dot = hasEntry
     ? dayType
       ? <span className={`mt-1 h-1.5 w-1.5 rounded-full ${dotColour[dayType]}`} />
@@ -31,8 +32,8 @@ export function DayCell({ day, isToday, isSelected, hasEntry, dayType, onClick }
       ].join(' ')}
     >
       <span className={[
-        'flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium',
-        isToday ? 'bg-primary text-primary-foreground' : 'text-foreground',
+        'flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium',
+        isToday ? 'bg-primary text-primary-foreground' : isWeekend ? 'text-muted-foreground/50' : 'text-foreground',
       ].join(' ')}>
         {day}
       </span>
