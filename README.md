@@ -1,73 +1,94 @@
-# React + TypeScript + Vite
+# Standbase — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend for [Standbase](https://standbase.shivankkapoor.com), a personal standup journal. Write and review daily standups on a calendar interface, with full-page editing, day-type classification, and TOTP-protected login.
 
-Currently, two official plugins are available:
+> **Backend repo:** [standbase-backend](https://github.com/ShivankKapoor/standbase-backend)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
 
-## React Compiler
+- **React 19** + **Vite 8** — `@vitejs/plugin-react`
+- **TypeScript 6** — strict mode with path alias `@/ → src/`
+- **Tailwind CSS v4** — configured entirely in `index.css`, no `tailwind.config.ts`
+- **shadcn/ui** — component library in `src/components/ui/`
+- **React Router v7** — client-side routing with protected routes
+- **vaul** — mobile bottom drawer for day entries
+- **sonner** — toast notifications
+- **date-fns** — date formatting
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- Monthly calendar view with colour-coded day types (PTO, Planning, Support)
+- Inline side panel on desktop; bottom drawer on mobile
+- Full-page entry editor at `/entry/:date`
+- TOTP two-factor authentication with an animated 6-box OTP input
+- Light/dark theme toggle persisted to `localStorage` with no flash on load
+- Optimistic save and delete with error rollback
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Local Development
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Prerequisites:** Node.js 20+
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Create a `.env` file in the project root:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=http://localhost:5554
 ```
+
+```bash
+npm run dev      # Dev server at http://localhost:5173
+npm run build    # Type-check + production build → dist/
+npm run preview  # Preview the production build
+```
+
+## Container (Podman / Docker)
+
+`VITE_API_URL` is baked in at build time — rebuild the image if it changes.
+
+```bash
+VITE_API_URL=https://standbase.shivankkapoor.com ./run.sh   # Build and start on port 3000
+PORT=8080 VITE_API_URL=https://standbase.shivankkapoor.com ./run.sh  # Custom port
+./stop.sh   # Stop and remove the container
+```
+
+nginx serves the built static files. All unknown routes fall back to `index.html` for SPA routing. Hashed assets are cached for 1 year; `index.html` is never cached.
+
+## Project Structure
+
+```
+src/
+├── api/
+│   ├── client.ts        # apiFetch() — injects Bearer token, throws ApiError on non-2xx
+│   ├── auth.ts          # login(), verifyTotp(), logout(), checkSession()
+│   └── entries.ts       # getEntries(), getEntry(), createEntry(), deleteEntry()
+├── components/
+│   ├── ui/              # shadcn/ui components — do not edit manually
+│   ├── layout/          # Header, ThemeToggle
+│   ├── auth/            # LoginForm, TotpForm
+│   ├── calendar/        # MonthCalendar, DayCell
+│   └── entry/           # EntryPanel, DayTypeBadge
+├── context/
+│   └── AuthContext.tsx  # Token + username in state and localStorage
+├── hooks/
+│   ├── useAuth.ts       # Login/logout helpers
+│   ├── useEntries.ts    # Month entry fetching with optimistic updates
+│   └── useIsMobile.ts   # window.matchMedia hook (breakpoint 768px)
+├── pages/
+│   ├── LoginPage.tsx        # LoginForm / TotpForm toggle
+│   ├── DashboardPage.tsx    # Calendar + entry panel
+│   └── EntryEditorPage.tsx  # Full-page editor at /entry/:date
+├── types/
+│   └── index.ts         # Entry, DayType, LoginResult, SessionCheck
+└── index.css            # Tailwind directives, theme tokens, custom keyframes
+```
+
+## Auth Flow
+
+1. POST credentials → `/auth/login`
+2. If TOTP is enabled, receive `totp_required` and a short-lived pre-auth token
+3. Submit OTP → `/auth/totp/verify` → receive session token
+4. Token stored in `AuthContext` and `localStorage`; validated on page load via `GET /session/check`
+5. `ProtectedRoute` in `App.tsx` redirects unauthenticated users to `/login`
