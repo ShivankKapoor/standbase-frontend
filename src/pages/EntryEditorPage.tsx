@@ -138,7 +138,7 @@ export function EntryEditorPage() {
                 </Button>
               </div>
               <Textarea
-                className="min-h-96 flex-1 resize-none font-mono text-sm"
+                className="min-h-96 flex-1 resize-none text-sm" style={{ fontFamily: "'IBM Plex Mono', monospace" }}
                 placeholder="What did you work on?"
                 maxLength={2000}
                 value={content}
