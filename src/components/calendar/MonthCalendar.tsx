@@ -1,4 +1,7 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, NotebookPen, ListTodo } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '../ui/button';
 import { DayCell } from './DayCell';
@@ -10,6 +13,7 @@ interface MonthCalendarProps {
   year: number;
   month: number;
   entries: EntryOverview[];
+  todoSummary: Record<string, boolean>;
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
   onPrev: () => void;
@@ -17,15 +21,24 @@ interface MonthCalendarProps {
   onToday: () => void;
 }
 
+interface ContextMenuState {
+  date: string;
+  x: number;
+  y: number;
+}
+
 function toDateStr(year: number, month: number, day: number): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate, onPrev, onNext, onToday }: MonthCalendarProps) {
+export function MonthCalendar({ year, month, entries, todoSummary, selectedDate, onSelectDate, onPrev, onNext, onToday }: MonthCalendarProps) {
+  const navigate = useNavigate();
   const entryMap = new Map(entries.map((e) => [e.date, e.dayType]));
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const firstDay = new Date(year, month - 1, 1);
-  const startOffset = firstDay.getDay(); // Sunday = 0
+  const startOffset = firstDay.getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
 
   const today = new Date();
@@ -36,6 +49,30 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
   while (cells.length % 7 !== 0) cells.push(null);
+
+  useEffect(() => {
+    if (!contextMenu) return;
+    function handleDismiss(e: MouseEvent | KeyboardEvent) {
+      if (e instanceof KeyboardEvent && e.key !== 'Escape') return;
+      setContextMenu(null);
+    }
+    window.addEventListener('click', handleDismiss);
+    window.addEventListener('keydown', handleDismiss);
+    return () => {
+      window.removeEventListener('click', handleDismiss);
+      window.removeEventListener('keydown', handleDismiss);
+    };
+  }, [contextMenu]);
+
+  // Clamp menu position so it never overflows the viewport
+  function clampedPosition(x: number, y: number) {
+    const menuW = 180;
+    const menuH = 88;
+    return {
+      left: Math.min(x, window.innerWidth - menuW - 8),
+      top: Math.min(y, window.innerHeight - menuH - 8),
+    };
+  }
 
   return (
     <div className="flex flex-1 flex-col min-h-0 animate-fade-in">
@@ -72,8 +109,17 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
             return <div key={i} className="bg-background" />;
           }
           const date = toDateStr(year, month, day);
+          const hasTodo = date in todoSummary;
+          const todoStatus = hasTodo ? (todoSummary[date] ? 'done' : 'pending') : null;
           return (
-            <div key={date} className="h-full bg-background">
+            <div
+              key={date}
+              className="h-full bg-background"
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setContextMenu({ date, x: e.clientX, y: e.clientY });
+              }}
+            >
               <DayCell
                 day={day}
                 isToday={date === todayStr}
@@ -81,12 +127,38 @@ export function MonthCalendar({ year, month, entries, selectedDate, onSelectDate
                 isWeekend={isWeekend}
                 hasEntry={entryMap.has(date)}
                 dayType={entryMap.get(date) ?? null}
+                todoStatus={todoStatus}
                 onClick={() => onSelectDate(date)}
               />
             </div>
           );
         })}
       </div>
+
+      {contextMenu && createPortal(
+        <div
+          ref={menuRef}
+          style={{ position: 'fixed', ...clampedPosition(contextMenu.x, contextMenu.y) }}
+          className="z-50 min-w-[176px] rounded-md border bg-popover p-1 shadow-md animate-fade-in"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="flex w-full items-center gap-2 rounded-sm px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+            onClick={() => { navigate(`/entry/${contextMenu.date}`); setContextMenu(null); }}
+          >
+            <NotebookPen className="h-3.5 w-3.5 text-muted-foreground" />
+            Open Standup
+          </button>
+          <button
+            className="flex w-full items-center gap-2 rounded-sm px-3 py-1.5 text-left text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+            onClick={() => { navigate(`/todos/${contextMenu.date}`); setContextMenu(null); }}
+          >
+            <ListTodo className="h-3.5 w-3.5 text-muted-foreground" />
+            Open Tasks
+          </button>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
