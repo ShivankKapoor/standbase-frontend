@@ -9,8 +9,10 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DayTypeBadge } from './DayTypeBadge';
+import { TodoList } from './TodoList';
 import { getEntry, createEntry, deleteEntry } from '../../api/entries';
-import type { DayType, EntryOverview } from '../../types';
+import { useTodos } from '../../hooks/useTodos';
+import type { DayType, EntryOverview, Todo } from '../../types';
 
 const STANDUP_TEMPLATE = `📆 What you did yesterday\n👉 What you are doing today\n🛑 Blockers preventing you from making progress`;
 
@@ -19,9 +21,10 @@ interface EntryPanelProps {
   onClose: () => void;
   onSave: (date: string, dayType: EntryOverview['dayType']) => void;
   onDelete: (date: string) => void;
+  onTodosChange: (date: string, todos: Todo[]) => void;
 }
 
-export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps) {
+export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange }: EntryPanelProps) {
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [dayType, setDayType] = useState<DayType | null>(null);
@@ -32,6 +35,12 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
   const [showDiscard, setShowDiscard] = useState(false);
   const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, removeTodo, reorderTodo } = useTodos(date);
+
+  useEffect(() => {
+    if (todosFetched) onTodosChange(date, todos);
+  }, [todos, todosFetched]);
 
   const isDirty = content !== savedContent || dayType !== savedDayType;
 
@@ -140,7 +149,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
               </Select>
             </div>
 
-            <div className="flex flex-1 flex-col space-y-2">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
                   Notes
@@ -156,7 +165,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
                 </Button>
               </div>
               <Textarea
-                className="flex-1 resize-none text-sm min-h-48" style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                className="resize-none text-sm min-h-48" style={{ fontFamily: "'IBM Plex Mono', monospace" }}
                 placeholder="What did you work on?"
                 maxLength={2000}
                 value={content}
@@ -164,6 +173,16 @@ export function EntryPanel({ date, onClose, onSave, onDelete }: EntryPanelProps)
               />
               <p className="text-right text-xs text-muted-foreground">{content.length}/2000</p>
             </div>
+
+            <TodoList
+              todos={todos}
+              loading={todosLoading}
+              onAdd={addTodo}
+              onToggle={toggleTodo}
+              onRemove={removeTodo}
+              onReorder={reorderTodo}
+              onExpand={() => navigate(`/todos/${date}`)}
+            />
           </>
         )}
       </div>

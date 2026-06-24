@@ -13,14 +13,19 @@ interface DayCellProps {
   isWeekend: boolean;
   hasEntry: boolean;
   dayType: DayType | null;
+  todoStatus: 'pending' | 'done' | null;
   onClick: () => void;
 }
 
-export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType, onClick }: DayCellProps) {
-  const dot = hasEntry
+export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType, todoStatus, onClick }: DayCellProps) {
+  const entryDot = hasEntry
     ? dayType
-      ? <span className={`mt-1 h-1.5 w-1.5 rounded-full ${dotColour[dayType]}`} />
-      : <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#FF6319]" />
+      ? <span className={`h-1.5 w-1.5 rounded-full ${dotColour[dayType]}`} />
+      : <span className="h-1.5 w-1.5 rounded-full bg-[#FF6319]" />
+    : null;
+
+  const todoDot = todoStatus
+    ? <span className={`h-1.5 w-1.5 rounded-sm ${todoStatus === 'done' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
     : null;
 
   return (
@@ -37,7 +42,10 @@ export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType
       ].join(' ')}>
         {day}
       </span>
-      {dot}
+      <div className="mt-1 flex flex-col gap-0.5">
+        {entryDot}
+        {todoDot}
+      </div>
     </button>
   );
 }
