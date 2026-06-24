@@ -5,7 +5,9 @@ import { MonthCalendar } from '../components/calendar/MonthCalendar';
 import { EntryPanel } from '../components/entry/EntryPanel';
 import { Drawer, DrawerContent } from '../components/ui/drawer';
 import { useEntries } from '../hooks/useEntries';
+import { useTodoSummary } from '../hooks/useTodoSummary';
 import { useIsMobile } from '../hooks/useIsMobile';
+import type { Todo } from '../types';
 
 export function DashboardPage() {
   const today = new Date();
@@ -17,6 +19,11 @@ export function DashboardPage() {
   const isMobile = useIsMobile();
 
   const { entries, updateEntry, removeEntry } = useEntries(year, month);
+  const { summaryMap: todoSummaryMap, updateTodoSummary } = useTodoSummary(year, month);
+
+  function handleTodosChange(date: string, todos: Todo[]) {
+    updateTodoSummary(date, todos);
+  }
 
   useEffect(() => {
     if (selectedDate) {
@@ -70,6 +77,7 @@ export function DashboardPage() {
               year={year}
               month={month}
               entries={entries}
+              todoSummary={todoSummaryMap}
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
               onPrev={prevMonth}
@@ -95,6 +103,7 @@ export function DashboardPage() {
                   onClose={closePanel}
                   onSave={updateEntry}
                   onDelete={removeEntry}
+                  onTodosChange={handleTodosChange}
                 />
               </div>
             )}
@@ -112,6 +121,7 @@ export function DashboardPage() {
                 onClose={() => { setSelectedDate(null); setPanelDate(null); }}
                 onSave={updateEntry}
                 onDelete={removeEntry}
+                onTodosChange={handleTodosChange}
               />
             )}
           </DrawerContent>
