@@ -22,3 +22,16 @@ export interface SessionCheck {
   status: string;
   userName: string;
 }
+
+export interface Todo {
+  id: string;
+  entryDate: string;
+  content: string;
+  completed: boolean;
+  position: number;
+}
+
+export interface TodoSummary {
+  date: string;
+  allCompleted: boolean;
+}
