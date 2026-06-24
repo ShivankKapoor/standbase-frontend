@@ -17,7 +17,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Maximize2, Plus, Trash2 } from 'lucide-react';
+import { Check, GripVertical, Maximize2, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -47,12 +47,18 @@ function SortableTodoItem({ todo, onToggle, onRemove }: SortableTodoItemProps) {
       >
         <GripVertical className="h-3.5 w-3.5" />
       </button>
-      <input
-        type="checkbox"
-        checked={todo.completed}
-        onChange={(e) => onToggle(todo.id, e.target.checked)}
-        className="h-3.5 w-3.5 shrink-0 cursor-pointer accent-primary"
-      />
+      <button
+        onClick={() => onToggle(todo.id, !todo.completed)}
+        className={[
+          'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border transition-colors',
+          todo.completed
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-muted-foreground/40 bg-transparent hover:border-primary',
+        ].join(' ')}
+        aria-label={todo.completed ? 'Mark incomplete' : 'Mark complete'}
+      >
+        {todo.completed && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+      </button>
       <span className={[
         'flex-1 text-sm leading-snug',
         todo.completed ? 'line-through text-muted-foreground' : 'text-foreground',
