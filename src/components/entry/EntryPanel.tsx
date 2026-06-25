@@ -36,7 +36,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange }: E
   const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
-  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, removeTodo, reorderTodo } = useTodos(date);
+  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo } = useTodos(date);
 
   useEffect(() => {
     if (todosFetched) onTodosChange(date, todos);
@@ -180,6 +180,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange }: E
               onAdd={addTodo}
               onToggle={toggleTodo}
               onRemove={removeTodo}
+              onEdit={editTodo}
               onReorder={reorderTodo}
               onExpand={() => navigate(`/todos/${date}`)}
             />
