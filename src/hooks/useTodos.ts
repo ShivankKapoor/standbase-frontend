@@ -77,5 +77,18 @@ export function useTodos(date: string | null) {
     }
   }, []);
 
-  return { todos, loading, fetched, addTodo, toggleTodo, removeTodo, reorderTodo };
+  const editTodo = useCallback(async (id: string, content: string) => {
+    let snapshot: string | undefined;
+    setTodos((prev) => {
+      snapshot = prev.find((t) => t.id === id)?.content;
+      return prev.map((t) => t.id === id ? { ...t, content } : t);
+    });
+    try {
+      await apiUpdate(id, { content });
+    } catch {
+      setTodos((prev) => prev.map((t) => t.id === id ? { ...t, content: snapshot ?? t.content } : t));
+    }
+  }, []);
+
+  return { todos, loading, fetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo };
 }

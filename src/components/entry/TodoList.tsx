@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import {
   DndContext,
@@ -17,7 +17,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Check, GripVertical, Maximize2, Plus, Trash2 } from 'lucide-react';
+import { Check, GripVertical, Maximize2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -28,10 +28,33 @@ interface SortableTodoItemProps {
   todo: Todo;
   onToggle: (id: string, completed: boolean) => void;
   onRemove: (id: string) => void;
+  onEdit: (id: string, content: string) => void;
 }
 
-function SortableTodoItem({ todo, onToggle, onRemove }: SortableTodoItemProps) {
+function SortableTodoItem({ todo, onToggle, onRemove, onEdit }: SortableTodoItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(todo.content);
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) {
+      setEditValue(todo.content);
+      editInputRef.current?.focus();
+      editInputRef.current?.select();
+    }
+  }, [editing, todo.content]);
+
+  function commitEdit() {
+    const trimmed = editValue.trim();
+    if (trimmed && trimmed !== todo.content) onEdit(todo.id, trimmed);
+    setEditing(false);
+  }
+
+  function handleEditKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') commitEdit();
+    if (e.key === 'Escape') setEditing(false);
+  }
 
   return (
     <li
@@ -59,12 +82,31 @@ function SortableTodoItem({ todo, onToggle, onRemove }: SortableTodoItemProps) {
       >
         {todo.completed && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
       </button>
-      <span className={[
-        'flex-1 text-sm leading-snug',
-        todo.completed ? 'line-through text-muted-foreground' : 'text-foreground',
-      ].join(' ')}>
-        {todo.content}
-      </span>
+      {editing ? (
+        <input
+          ref={editInputRef}
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={commitEdit}
+          onKeyDown={handleEditKeyDown}
+          maxLength={500}
+          className="flex-1 rounded border border-input bg-transparent px-1 text-sm leading-snug outline-none focus:border-primary"
+        />
+      ) : (
+        <span className={[
+          'flex-1 text-sm leading-snug',
+          todo.completed ? 'line-through text-muted-foreground' : 'text-foreground',
+        ].join(' ')}>
+          {todo.content}
+        </span>
+      )}
+      <button
+        onClick={() => setEditing(true)}
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+        aria-label="Edit task"
+      >
+        <Pencil className="h-3 w-3" />
+      </button>
       <button
         onClick={() => onRemove(todo.id)}
         className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-destructive"
@@ -82,11 +124,12 @@ interface TodoListProps {
   onAdd: (content: string) => Promise<void>;
   onToggle: (id: string, completed: boolean) => void;
   onRemove: (id: string) => void;
+  onEdit: (id: string, content: string) => void;
   onReorder: (newOrder: Todo[]) => Promise<void>;
   onExpand?: () => void;
 }
 
-export function TodoList({ todos, loading, onAdd, onToggle, onRemove, onReorder, onExpand }: TodoListProps) {
+export function TodoList({ todos, loading, onAdd, onToggle, onRemove, onEdit, onReorder, onExpand }: TodoListProps) {
   const [input, setInput] = useState('');
   const [adding, setAdding] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -161,6 +204,7 @@ export function TodoList({ todos, loading, onAdd, onToggle, onRemove, onReorder,
                   todo={todo}
                   onToggle={onToggle}
                   onRemove={onRemove}
+                  onEdit={onEdit}
                 />
               ))}
             </ul>
