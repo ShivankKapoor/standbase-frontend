@@ -17,21 +17,34 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { addDays, subDays, format, parseISO } from 'date-fns';
 import { Check, GripVertical, Maximize2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '../ui/context-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Calendar } from '../ui/calendar';
 import type { Todo } from '../../types';
 
 interface SortableTodoItemProps {
   todo: Todo;
+  date?: string;
   onToggle: (id: string, completed: boolean) => void;
   onRemove: (id: string) => void;
   onEdit: (id: string, content: string) => void;
+  onMove?: (id: string, targetDate: string) => void;
+  onRequestCustomMove?: (id: string, entryDate: string) => void;
 }
 
-function SortableTodoItem({ todo, onToggle, onRemove, onEdit }: SortableTodoItemProps) {
+function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRequestCustomMove }: SortableTodoItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
@@ -56,7 +69,15 @@ function SortableTodoItem({ todo, onToggle, onRemove, onEdit }: SortableTodoItem
     if (e.key === 'Escape') setEditing(false);
   }
 
-  return (
+  const parsedDate = date ? parseISO(date) : null;
+  const prevDate = parsedDate ? format(subDays(parsedDate, 1), 'yyyy-MM-dd') : null;
+  const nextDate = parsedDate ? format(addDays(parsedDate, 1), 'yyyy-MM-dd') : null;
+  const isFriday = parsedDate?.getDay() === 5;
+  const nextMonday = parsedDate && isFriday ? format(addDays(parsedDate, 3), 'yyyy-MM-dd') : null;
+  const isMonday = parsedDate?.getDay() === 1;
+  const prevFriday = parsedDate && isMonday ? format(subDays(parsedDate, 3), 'yyyy-MM-dd') : null;
+
+  const item = (
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
@@ -116,23 +137,60 @@ function SortableTodoItem({ todo, onToggle, onRemove, onEdit }: SortableTodoItem
       </button>
     </li>
   );
+
+  if (!onMove || !prevDate || !nextDate) return item;
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger>{item}</ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => onMove(todo.id, prevDate)}>
+          Move to previous day
+        </ContextMenuItem>
+        <ContextMenuItem onClick={() => onMove(todo.id, nextDate)}>
+          Move to next day
+        </ContextMenuItem>
+        {nextMonday && (
+          <ContextMenuItem onClick={() => onMove(todo.id, nextMonday)}>
+            Move to next Monday
+          </ContextMenuItem>
+        )}
+        {prevFriday && (
+          <ContextMenuItem onClick={() => onMove(todo.id, prevFriday)}>
+            Move to previous Friday
+          </ContextMenuItem>
+        )}
+        {onRequestCustomMove && (
+          <>
+            <ContextMenuSeparator />
+            <ContextMenuItem onClick={() => onRequestCustomMove(todo.id, todo.entryDate)}>
+              Move to custom date…
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuContent>
+    </ContextMenu>
+  );
 }
 
 interface TodoListProps {
   todos: Todo[];
   loading: boolean;
+  date?: string;
   onAdd: (content: string) => Promise<void>;
   onToggle: (id: string, completed: boolean) => void;
   onRemove: (id: string) => void;
   onEdit: (id: string, content: string) => void;
   onReorder: (newOrder: Todo[]) => Promise<void>;
+  onMove?: (id: string, targetDate: string) => void;
   onExpand?: () => void;
 }
 
-export function TodoList({ todos, loading, onAdd, onToggle, onRemove, onEdit, onReorder, onExpand }: TodoListProps) {
+export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEdit, onReorder, onMove, onExpand }: TodoListProps) {
   const [input, setInput] = useState('');
   const [adding, setAdding] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [customMoveTodo, setCustomMoveTodo] = useState<{ id: string; entryDate: string } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -202,9 +260,12 @@ export function TodoList({ todos, loading, onAdd, onToggle, onRemove, onEdit, on
                 <SortableTodoItem
                   key={todo.id}
                   todo={todo}
+                  date={date}
                   onToggle={onToggle}
                   onRemove={onRemove}
                   onEdit={onEdit}
+                  onMove={onMove}
+                  onRequestCustomMove={onMove ? (id, entryDate) => setCustomMoveTodo({ id, entryDate }) : undefined}
                 />
               ))}
             </ul>
@@ -233,6 +294,27 @@ export function TodoList({ todos, loading, onAdd, onToggle, onRemove, onEdit, on
           <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
+
+      <Dialog open={customMoveTodo !== null} onOpenChange={(open) => { if (!open) setCustomMoveTodo(null); }}>
+        <DialogContent showCloseButton={false} className="w-fit p-4">
+          <DialogHeader>
+            <DialogTitle>Move to date</DialogTitle>
+          </DialogHeader>
+          {customMoveTodo && (
+            <Calendar
+              mode="single"
+              selected={parseISO(customMoveTodo.entryDate)}
+              defaultMonth={parseISO(customMoveTodo.entryDate)}
+              onSelect={(day) => {
+                if (day && onMove) {
+                  onMove(customMoveTodo.id, format(day, 'yyyy-MM-dd'));
+                  setCustomMoveTodo(null);
+                }
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

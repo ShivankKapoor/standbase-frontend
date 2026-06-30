@@ -31,5 +31,15 @@ export function useTodoSummary(year: number, month: number) {
     });
   }, []);
 
-  return { summaryMap, updateTodoSummary };
+  const refresh = useCallback(async () => {
+    getTodoSummary(year, month)
+      .then((data) => {
+        const map: Record<string, boolean> = {};
+        data.forEach((s) => { map[s.date] = s.allCompleted; });
+        setSummaryMap(map);
+      })
+      .catch(() => {});
+  }, [year, month]);
+
+  return { summaryMap, updateTodoSummary, refresh };
 }

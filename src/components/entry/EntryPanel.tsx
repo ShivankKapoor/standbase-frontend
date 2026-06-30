@@ -22,9 +22,10 @@ interface EntryPanelProps {
   onSave: (date: string, dayType: EntryOverview['dayType']) => void;
   onDelete: (date: string) => void;
   onTodosChange: (date: string, todos: Todo[]) => void;
+  onMoveComplete?: () => void;
 }
 
-export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange }: EntryPanelProps) {
+export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onMoveComplete }: EntryPanelProps) {
   const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [dayType, setDayType] = useState<DayType | null>(null);
@@ -36,7 +37,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange }: E
   const [showTemplateConfirm, setShowTemplateConfirm] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
-  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo } = useTodos(date);
+  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo, moveTodo } = useTodos(date);
 
   useEffect(() => {
     if (todosFetched) onTodosChange(date, todos);
@@ -177,11 +178,13 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange }: E
             <TodoList
               todos={todos}
               loading={todosLoading}
+              date={date}
               onAdd={addTodo}
               onToggle={toggleTodo}
               onRemove={removeTodo}
               onEdit={editTodo}
               onReorder={reorderTodo}
+              onMove={async (id, targetDate) => { await moveTodo(id, targetDate); onMoveComplete?.(); }}
               onExpand={() => navigate(`/todos/${date}`)}
             />
           </>
