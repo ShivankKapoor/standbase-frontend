@@ -27,8 +27,11 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
+  ContextMenuSeparator,
   ContextMenuTrigger,
 } from '../ui/context-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Calendar } from '../ui/calendar';
 import type { Todo } from '../../types';
 
 interface SortableTodoItemProps {
@@ -38,9 +41,10 @@ interface SortableTodoItemProps {
   onRemove: (id: string) => void;
   onEdit: (id: string, content: string) => void;
   onMove?: (id: string, targetDate: string) => void;
+  onRequestCustomMove?: (id: string, entryDate: string) => void;
 }
 
-function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove }: SortableTodoItemProps) {
+function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRequestCustomMove }: SortableTodoItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
@@ -156,6 +160,14 @@ function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove }: So
             Move to previous Friday
           </ContextMenuItem>
         )}
+        {onRequestCustomMove && (
+          <>
+            <ContextMenuSeparator />
+            <ContextMenuItem onClick={() => onRequestCustomMove(todo.id, todo.entryDate)}>
+              Move to custom date…
+            </ContextMenuItem>
+          </>
+        )}
       </ContextMenuContent>
     </ContextMenu>
   );
@@ -178,6 +190,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
   const [input, setInput] = useState('');
   const [adding, setAdding] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [customMoveTodo, setCustomMoveTodo] = useState<{ id: string; entryDate: string } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -252,6 +265,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
                   onRemove={onRemove}
                   onEdit={onEdit}
                   onMove={onMove}
+                  onRequestCustomMove={onMove ? (id, entryDate) => setCustomMoveTodo({ id, entryDate }) : undefined}
                 />
               ))}
             </ul>
@@ -280,6 +294,27 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
           <Plus className="h-3.5 w-3.5" />
         </Button>
       </div>
+
+      <Dialog open={customMoveTodo !== null} onOpenChange={(open) => { if (!open) setCustomMoveTodo(null); }}>
+        <DialogContent showCloseButton={false} className="w-fit p-4">
+          <DialogHeader>
+            <DialogTitle>Move to date</DialogTitle>
+          </DialogHeader>
+          {customMoveTodo && (
+            <Calendar
+              mode="single"
+              selected={parseISO(customMoveTodo.entryDate)}
+              defaultMonth={parseISO(customMoveTodo.entryDate)}
+              onSelect={(day) => {
+                if (day && onMove) {
+                  onMove(customMoveTodo.id, format(day, 'yyyy-MM-dd'));
+                  setCustomMoveTodo(null);
+                }
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
