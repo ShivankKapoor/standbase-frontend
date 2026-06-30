@@ -12,7 +12,7 @@ export function createTodo(entryDate: string, content: string): Promise<Todo> {
   });
 }
 
-export function updateTodo(id: string, patch: { content?: string; completed?: boolean }): Promise<Todo> {
+export function updateTodo(id: string, patch: { content?: string; completed?: boolean; entryDate?: string }): Promise<Todo> {
   return apiFetch(`/todos/${id}`, {
     method: 'PUT',
     body: JSON.stringify(patch),

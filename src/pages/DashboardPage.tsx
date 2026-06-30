@@ -19,7 +19,7 @@ export function DashboardPage() {
   const isMobile = useIsMobile();
 
   const { entries, updateEntry, removeEntry } = useEntries(year, month);
-  const { summaryMap: todoSummaryMap, updateTodoSummary } = useTodoSummary(year, month);
+  const { summaryMap: todoSummaryMap, updateTodoSummary, refresh: refreshTodoSummary } = useTodoSummary(year, month);
 
   function handleTodosChange(date: string, todos: Todo[]) {
     updateTodoSummary(date, todos);
@@ -104,6 +104,7 @@ export function DashboardPage() {
                   onSave={updateEntry}
                   onDelete={removeEntry}
                   onTodosChange={handleTodosChange}
+                  onMoveComplete={refreshTodoSummary}
                 />
               </div>
             )}
@@ -122,6 +123,7 @@ export function DashboardPage() {
                 onSave={updateEntry}
                 onDelete={removeEntry}
                 onTodosChange={handleTodosChange}
+                onMoveComplete={refreshTodoSummary}
               />
             )}
           </DrawerContent>

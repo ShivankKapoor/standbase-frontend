@@ -90,5 +90,21 @@ export function useTodos(date: string | null) {
     }
   }, []);
 
-  return { todos, loading, fetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo };
+  const moveTodo = useCallback(async (id: string, targetDate: string) => {
+    let snapshot: Todo | undefined;
+    setTodos((prev) => {
+      snapshot = prev.find((t) => t.id === id);
+      return prev.filter((t) => t.id !== id);
+    });
+    try {
+      await apiUpdate(id, { entryDate: targetDate });
+    } catch {
+      if (snapshot) {
+        const s = snapshot;
+        setTodos((prev) => [...prev, s].sort((a, b) => a.position - b.position));
+      }
+    }
+  }, []);
+
+  return { todos, loading, fetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo, moveTodo };
 }
