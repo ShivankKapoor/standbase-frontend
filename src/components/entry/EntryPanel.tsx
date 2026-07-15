@@ -12,6 +12,7 @@ import { DayTypeBadge } from './DayTypeBadge';
 import { TodoList } from './TodoList';
 import { getEntry, createEntry, deleteEntry } from '../../api/entries';
 import { useTodos } from '../../hooks/useTodos';
+import { formatTalkingTime } from '../../lib/utils';
 import type { DayType, EntryOverview, Todo } from '../../types';
 
 const STANDUP_TEMPLATE = `📆 What you did yesterday\n👉 What you are doing today\n🛑 Blockers preventing you from making progress`;
@@ -172,7 +173,10 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
-              <p className="text-right text-xs text-muted-foreground">{content.length}/2000</p>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{content.trim() ? `~${formatTalkingTime(content)} to say` : ''}</span>
+                <span>{content.length}/2000</span>
+              </div>
             </div>
 
             <TodoList
