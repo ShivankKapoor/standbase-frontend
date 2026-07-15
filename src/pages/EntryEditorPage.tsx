@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 import { DayTypeBadge } from '../components/entry/DayTypeBadge';
 import { getEntry, createEntry, deleteEntry } from '../api/entries';
+import { formatTalkingTime } from '../lib/utils';
 import type { DayType } from '../types';
 
 const STANDUP_TEMPLATE = `📆 What you did yesterday\n👉 What you are doing today\n🛑 Blockers preventing you from making progress`;
@@ -144,7 +145,10 @@ export function EntryEditorPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
-              <p className="text-right text-xs text-muted-foreground">{content.length}/2000</p>
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{content.trim() ? `~${formatTalkingTime(content)} to say` : ''}</span>
+                <span>{content.length}/2000</span>
+              </div>
             </div>
 
             <div className="flex items-center justify-between border-t pt-4">

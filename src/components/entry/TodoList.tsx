@@ -188,7 +188,6 @@ interface TodoListProps {
 
 export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEdit, onReorder, onMove, onExpand }: TodoListProps) {
   const [input, setInput] = useState('');
-  const [adding, setAdding] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [customMoveTodo, setCustomMoveTodo] = useState<{ id: string; entryDate: string } | null>(null);
 
@@ -197,19 +196,11 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  async function handleAdd() {
+  function handleAdd() {
     const content = input.trim();
     if (!content) return;
-    setAdding(true);
-    try {
-      await onAdd(content);
-      setInput('');
-      inputRef.current?.focus();
-    } catch {
-      toast.error('Failed to add task');
-    } finally {
-      setAdding(false);
-    }
+    setInput('');
+    onAdd(content).catch(() => toast.error('Failed to add task'));
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
@@ -282,14 +273,13 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
           placeholder="Add a task…"
           className="h-7 text-sm"
           maxLength={500}
-          disabled={adding}
         />
         <Button
           size="icon"
           variant="ghost"
           className="h-7 w-7 shrink-0"
           onClick={handleAdd}
-          disabled={!input.trim() || adding}
+          disabled={!input.trim()}
         >
           <Plus className="h-3.5 w-3.5" />
         </Button>
