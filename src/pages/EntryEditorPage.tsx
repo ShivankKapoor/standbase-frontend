@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router';
 import { format, parseISO } from 'date-fns';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Presentation, Trash2 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import { Header } from '../components/layout/Header';
 import { Button } from '../components/ui/button';
@@ -89,7 +89,7 @@ export function EntryEditorPage() {
           <Button variant="ghost" size="icon" onClick={() => isDirty ? setShowDiscard(true) : navigate('/')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-semibold">
               {parsedDate ? format(parsedDate, 'EEEE') : '—'}
             </h1>
@@ -97,6 +97,15 @@ export function EntryEditorPage() {
               {parsedDate ? format(parsedDate, 'd MMMM yyyy') : ''}
             </p>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Present"
+            onClick={() => navigate(`/entry/${date}/present`, { state: { content } })}
+            disabled={!content.trim()}
+          >
+            <Presentation className="h-4 w-4" />
+          </Button>
         </div>
 
         {loading ? (

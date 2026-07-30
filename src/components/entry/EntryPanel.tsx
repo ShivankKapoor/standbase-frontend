@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { format, parseISO } from 'date-fns';
-import { X, Trash2, Maximize2 } from 'lucide-react';
+import { X, Trash2, Maximize2, Presentation } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -117,6 +117,15 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
           </span>
         </div>
         <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Present"
+            onClick={() => navigate(`/entry/${date}/present`, { state: { content } })}
+            disabled={!content.trim()}
+          >
+            <Presentation className="h-4 w-4" />
+          </Button>
           <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`, { state: { draft: { content, dayType }, saved: { content: savedContent, dayType: savedDayType } } })} aria-label="Open full editor">
             <Maximize2 className="h-4 w-4" />
           </Button>
