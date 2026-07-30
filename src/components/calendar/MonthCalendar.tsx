@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { ChevronLeft, ChevronRight, NotebookPen, ListTodo } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '../ui/button';
