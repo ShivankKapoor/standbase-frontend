@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { format, parseISO } from 'date-fns';
 import { X, Trash2, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';

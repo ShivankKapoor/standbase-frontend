@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router';
 import { format, parseISO } from 'date-fns';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
