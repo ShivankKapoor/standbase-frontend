@@ -108,7 +108,7 @@ export function PresentEntryPage() {
           <div className="m-auto h-10 w-64 animate-pulse rounded bg-muted" />
         ) : content.trim() ? (
           <p
-            className="m-auto w-full whitespace-pre-wrap text-center font-bold leading-snug tracking-wide"
+            className="m-auto w-full max-w-7xl whitespace-pre-wrap text-center font-bold leading-snug tracking-wide"
             style={{
               fontSize: `${fontSize}rem`,
               fontFamily: dyslexicFont ? "'OpenDyslexic', sans-serif" : undefined,
