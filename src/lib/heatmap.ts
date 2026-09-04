@@ -1,5 +1,12 @@
-import { addDays, format, subDays } from 'date-fns';
+import { addDays, format, parseISO, subDays } from 'date-fns';
 import type { HeatMapEntry } from '../types';
+
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+function isWeekend(date: Date): boolean {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+}
 
 export type HeatmapBucket = 0 | 1 | 2 | 3 | 4;
 
@@ -75,4 +82,79 @@ export function getWeeklyAverage(entries: HeatMapEntry[], today: Date): number {
   if (weekEntries.length === 0) return 0;
   const total = weekEntries.reduce((sum, e) => sum + e.wordCount, 0);
   return Math.round(total / weekEntries.length);
+}
+
+export function getTotalWords(entries: HeatMapEntry[]): number {
+  return entries.reduce((sum, e) => sum + e.wordCount, 0);
+}
+
+/** The weekday with the highest average word count per entry, or null with no entries yet. */
+export function getBusiestDayOfWeek(entries: HeatMapEntry[]): string | null {
+  const totals = new Array(7).fill(0);
+  const counts = new Array(7).fill(0);
+
+  for (const e of entries) {
+    if (e.wordCount <= 0) continue;
+    const day = parseISO(e.entryDate).getDay();
+    totals[day] += e.wordCount;
+    counts[day]++;
+  }
+
+  let bestDay = -1;
+  let bestAverage = -1;
+  for (let day = 0; day < 7; day++) {
+    if (counts[day] === 0) continue;
+    const average = totals[day] / counts[day];
+    if (average > bestAverage) {
+      bestAverage = average;
+      bestDay = day;
+    }
+  }
+
+  return bestDay === -1 ? null : WEEKDAY_NAMES[bestDay];
+}
+
+/**
+ * Consecutive weekdays with an entry, walking backward from today — weekends are
+ * skipped rather than treated as gaps. If today (or the most recent weekday) has
+ * no entry yet, it isn't counted as a break; the count starts from the prior weekday.
+ */
+export function getCurrentStreak(entries: HeatMapEntry[], today: Date): number {
+  const writtenDates = new Set(entries.filter((e) => e.wordCount > 0).map((e) => e.entryDate));
+
+  let cursor = today;
+  while (isWeekend(cursor)) cursor = subDays(cursor, 1);
+
+  if (!writtenDates.has(format(cursor, 'yyyy-MM-dd'))) {
+    cursor = subDays(cursor, 1);
+    while (isWeekend(cursor)) cursor = subDays(cursor, 1);
+  }
+
+  let streak = 0;
+  while (writtenDates.has(format(cursor, 'yyyy-MM-dd'))) {
+    streak++;
+    cursor = subDays(cursor, 1);
+    while (isWeekend(cursor)) cursor = subDays(cursor, 1);
+  }
+  return streak;
+}
+
+/** Longest run of consecutive weekdays with an entry within the past year. Weekends don't break a streak. */
+export function getLongestStreak(entries: HeatMapEntry[], today: Date): number {
+  const writtenDates = new Set(entries.filter((e) => e.wordCount > 0).map((e) => e.entryDate));
+  const start = subDays(today, 364);
+
+  let longest = 0;
+  let current = 0;
+  for (let i = 0; i <= 364; i++) {
+    const cursor = addDays(start, i);
+    if (isWeekend(cursor)) continue;
+    if (writtenDates.has(format(cursor, 'yyyy-MM-dd'))) {
+      current++;
+      longest = Math.max(longest, current);
+    } else {
+      current = 0;
+    }
+  }
+  return longest;
 }

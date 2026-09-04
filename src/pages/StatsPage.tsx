@@ -5,10 +5,18 @@ import { format, parseISO } from 'date-fns';
 import { Header } from '../components/layout/Header';
 import { HeatmapCalendar } from '../components/stats/HeatmapCalendar';
 import { StatTile } from '../components/stats/StatTile';
+import { StreakCard } from '../components/stats/StreakCard';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useHeatMap } from '../hooks/useHeatMap';
-import { getMostWordsDay, getWeeklyAverage } from '../lib/heatmap';
+import {
+  getBusiestDayOfWeek,
+  getCurrentStreak,
+  getLongestStreak,
+  getMostWordsDay,
+  getTotalWords,
+  getWeeklyAverage,
+} from '../lib/heatmap';
 
 export function StatsPage() {
   const navigate = useNavigate();
@@ -17,6 +25,10 @@ export function StatsPage() {
 
   const mostWordsDay = getMostWordsDay(entries);
   const weeklyAverage = getWeeklyAverage(entries, today);
+  const totalWords = getTotalWords(entries);
+  const busiestDay = getBusiestDayOfWeek(entries);
+  const currentStreak = getCurrentStreak(entries, today);
+  const longestStreak = getLongestStreak(entries, today);
 
   return (
     <div className="min-h-dvh bg-background">
@@ -44,7 +56,7 @@ export function StatsPage() {
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <StatTile label="Average words per entry" value={`${average}`} />
               <StatTile
                 label="Longest entry"
@@ -52,6 +64,9 @@ export function StatsPage() {
                 sublabel={mostWordsDay ? format(parseISO(mostWordsDay.entryDate), 'MMM d, yyyy') : undefined}
               />
               <StatTile label="This week's average" value={`${weeklyAverage} words`} />
+              <StreakCard currentStreak={currentStreak} longestStreak={longestStreak} />
+              <StatTile label="Total words this year" value={totalWords.toLocaleString()} />
+              <StatTile label="Busiest day of the week" value={busiestDay ?? '—'} />
             </div>
           </div>
         )}
