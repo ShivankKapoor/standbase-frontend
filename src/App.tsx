@@ -5,6 +5,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { EntryEditorPage } from './pages/EntryEditorPage';
 import { TodoEditorPage } from './pages/TodoEditorPage';
 import { PresentEntryPage } from './pages/PresentEntryPage';
+import { StatsPage } from './pages/StatsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, loading } = useAuthContext();
@@ -37,6 +38,14 @@ export default function App() {
         element={
           <ProtectedRoute>
             <PresentEntryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/stats"
+        element={
+          <ProtectedRoute>
+            <StatsPage />
           </ProtectedRoute>
         }
       />

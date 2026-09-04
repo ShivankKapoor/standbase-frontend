@@ -1,10 +1,12 @@
-import { LogOut } from 'lucide-react';
+import { ChartColumn, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { Button } from '../ui/button';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../../hooks/useAuth';
 
 export function Header() {
   const { username, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
@@ -17,7 +19,10 @@ export function Header() {
           {username && (
             <span className="mr-2 text-sm text-muted-foreground">{username}</span>
           )}
-<ThemeToggle />
+          <Button variant="ghost" size="icon" onClick={() => navigate('/stats')} aria-label="Statistics">
+            <ChartColumn className="h-4 w-4" />
+          </Button>
+          <ThemeToggle />
           <Button variant="ghost" size="icon" onClick={logout} aria-label="Logout">
             <LogOut className="h-4 w-4" />
           </Button>
