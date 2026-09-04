@@ -6,7 +6,7 @@ import type { HeatMapEntry } from '../types';
 export function useHeatMap(today: Date) {
   const [entries, setEntries] = useState<HeatMapEntry[]>([]);
   const [average, setAverage] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const todayStr = format(today, 'yyyy-MM-dd');

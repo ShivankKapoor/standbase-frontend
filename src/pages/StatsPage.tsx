@@ -45,7 +45,7 @@ export function StatsPage() {
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         {!loading && !error && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 animate-fade-in">
             <Card className="overflow-visible">
               <CardHeader>
                 <CardTitle>Writing activity</CardTitle>
