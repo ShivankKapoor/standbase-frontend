@@ -35,3 +35,14 @@ export interface TodoSummary {
   date: string;
   allCompleted: boolean;
 }
+
+export interface HeatMapEntry {
+  entryDate: string;
+  wordCount: number;
+}
+
+export interface HeatMapResponse {
+  status: string;
+  average: number;
+  entries: HeatMapEntry[];
+}
