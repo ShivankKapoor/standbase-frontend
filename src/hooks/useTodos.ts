@@ -11,23 +11,24 @@ import type { Todo } from '../types';
 export function useTodos(date: string | null) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
+  // Which date the current `todos` belong to, so callers can tell stale data from fresh.
+  const [fetchedDate, setFetchedDate] = useState<string | null>(null);
+  const fetched = date !== null && fetchedDate === date;
 
   useEffect(() => {
     if (!date) {
       setTodos([]);
-      setFetched(false);
+      setFetchedDate(null);
       return;
     }
     let cancelled = false;
-    setFetched(false);
     setLoading(true);
     getTodos(date)
       .then((data) => {
-        if (!cancelled) { setTodos(data); setFetched(true); }
+        if (!cancelled) { setTodos(data); setFetchedDate(date); }
       })
       .catch(() => {
-        if (!cancelled) { setTodos([]); setFetched(true); }
+        if (!cancelled) { setTodos([]); setFetchedDate(date); }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

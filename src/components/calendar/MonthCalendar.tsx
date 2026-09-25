@@ -37,6 +37,16 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Track which way the month changed so the grid slides in from the matching side.
+  const monthKey = year * 12 + month;
+  const [prevMonthKey, setPrevMonthKey] = useState(monthKey);
+  const [direction, setDirection] = useState<'next' | 'prev' | null>(null);
+  if (monthKey !== prevMonthKey) {
+    setDirection(monthKey > prevMonthKey ? 'next' : 'prev');
+    setPrevMonthKey(monthKey);
+  }
+  const slideClass = direction === 'next' ? 'animate-slide-in-right' : direction === 'prev' ? 'animate-slide-in-left' : '';
+
   const firstDay = new Date(year, month - 1, 1);
   const startOffset = firstDay.getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -85,7 +95,7 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <h2 className="text-xl font-semibold">
+        <h2 key={monthKey} className={`text-xl font-semibold ${direction ? 'animate-fade-in' : ''}`}>
           {format(firstDay, 'MMMM yyyy')}
         </h2>
         <Button variant="outline" size="sm" className="text-xs" onClick={onToday}>
@@ -101,38 +111,40 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
         ))}
       </div>
 
-      <div className="grid flex-1 min-h-0 grid-cols-7 [grid-auto-rows:1fr] gap-px border rounded-lg overflow-hidden bg-border">
-        {cells.map((day, i) => {
-          const col = i % 7;
-          const isWeekend = col === 0 || col === 6;
-          if (!day) {
-            return <div key={i} className="bg-background" />;
-          }
-          const date = toDateStr(year, month, day);
-          const hasTodo = date in todoSummary;
-          const todoStatus = hasTodo ? (todoSummary[date] ? 'done' : 'pending') : null;
-          return (
-            <div
-              key={date}
-              className="h-full bg-background"
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setContextMenu({ date, x: e.clientX, y: e.clientY });
-              }}
-            >
-              <DayCell
-                day={day}
-                isToday={date === todayStr}
-                isSelected={date === selectedDate}
-                isWeekend={isWeekend}
-                hasEntry={entryMap.has(date)}
-                dayType={entryMap.get(date) ?? null}
-                todoStatus={todoStatus}
-                onClick={() => onSelectDate(date)}
-              />
-            </div>
-          );
-        })}
+      <div className="flex-1 min-h-0 border rounded-lg overflow-hidden bg-background">
+        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] gap-px bg-border ${slideClass}`}>
+          {cells.map((day, i) => {
+            const col = i % 7;
+            const isWeekend = col === 0 || col === 6;
+            if (!day) {
+              return <div key={i} className="bg-background" />;
+            }
+            const date = toDateStr(year, month, day);
+            const hasTodo = date in todoSummary;
+            const todoStatus = hasTodo ? (todoSummary[date] ? 'done' : 'pending') : null;
+            return (
+              <div
+                key={date}
+                className="h-full bg-background"
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setContextMenu({ date, x: e.clientX, y: e.clientY });
+                }}
+              >
+                <DayCell
+                  day={day}
+                  isToday={date === todayStr}
+                  isSelected={date === selectedDate}
+                  isWeekend={isWeekend}
+                  hasEntry={entryMap.has(date)}
+                  dayType={entryMap.get(date) ?? null}
+                  todoStatus={todoStatus}
+                  onClick={() => onSelectDate(date)}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {contextMenu && createPortal(
