@@ -107,6 +107,17 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
     }
   }
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (!(saving || !ready || switching)) handleSave();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+
   async function handleDelete() {
     try {
       await deleteEntry(date);
