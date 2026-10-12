@@ -28,6 +28,7 @@ export interface Todo {
   entryDate: string;
   content: string;
   completed: boolean;
+  cancelled: boolean;
   position: number;
 }
 

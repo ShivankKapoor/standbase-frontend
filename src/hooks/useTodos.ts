@@ -51,6 +51,15 @@ export function useTodos(date: string | null) {
     }
   }, []);
 
+  const cancelTodo = useCallback(async (id: string, cancelled: boolean) => {
+    setTodos((prev) => prev.map((t) => t.id === id ? { ...t, cancelled } : t));
+    try {
+      await apiUpdate(id, { cancelled });
+    } catch {
+      setTodos((prev) => prev.map((t) => t.id === id ? { ...t, cancelled: !cancelled } : t));
+    }
+  }, []);
+
   const removeTodo = useCallback(async (id: string) => {
     let snapshot: Todo | undefined;
     setTodos((prev) => {
@@ -107,5 +116,5 @@ export function useTodos(date: string | null) {
     }
   }, []);
 
-  return { todos, loading, fetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo, moveTodo };
+  return { todos, loading, fetched, addTodo, toggleTodo, cancelTodo, removeTodo, reorderTodo, editTodo, moveTodo };
 }

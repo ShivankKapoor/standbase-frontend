@@ -42,7 +42,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
   // so we keep showing the previous day (dimmed) instead of flashing a skeleton.
   const [shownDate, setShownDate] = useState<string | null>(null);
 
-  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo, moveTodo } = useTodos(date);
+  const { todos, loading: todosLoading, fetched: todosFetched, addTodo, toggleTodo, cancelTodo, removeTodo, reorderTodo, editTodo, moveTodo } = useTodos(date);
 
   useEffect(() => {
     if (todosFetched) onTodosChange(date, todos);
@@ -225,6 +225,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
               date={date}
               onAdd={addTodo}
               onToggle={toggleTodo}
+              onCancel={cancelTodo}
               onRemove={removeTodo}
               onEdit={editTodo}
               onReorder={reorderTodo}

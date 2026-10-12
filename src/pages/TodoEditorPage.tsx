@@ -11,7 +11,7 @@ import { useTodos } from '../hooks/useTodos';
 export function TodoEditorPage() {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
-  const { todos, loading, addTodo, toggleTodo, removeTodo, reorderTodo, editTodo, moveTodo } = useTodos(date ?? null);
+  const { todos, loading, addTodo, toggleTodo, cancelTodo, removeTodo, reorderTodo, editTodo, moveTodo } = useTodos(date ?? null);
 
   const parsedDate = date ? parseISO(date) : null;
 
@@ -40,6 +40,7 @@ export function TodoEditorPage() {
           date={date}
           onAdd={addTodo}
           onToggle={toggleTodo}
+          onCancel={cancelTodo}
           onRemove={removeTodo}
           onEdit={editTodo}
           onReorder={reorderTodo}
