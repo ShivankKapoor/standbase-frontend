@@ -154,6 +154,10 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
     <ContextMenu>
       <ContextMenuTrigger>{item}</ContextMenuTrigger>
       <ContextMenuContent>
+        <ContextMenuItem onClick={() => onCancel(todo.id, !todo.cancelled)}>
+          {todo.cancelled ? 'Restore task' : 'Cancel task'}
+        </ContextMenuItem>
+        <ContextMenuSeparator />
         <ContextMenuItem onClick={() => onMove(todo.id, prevDate)}>
           Move to previous day
         </ContextMenuItem>

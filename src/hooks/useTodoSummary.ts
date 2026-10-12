@@ -27,7 +27,7 @@ export function useTodoSummary(year: number, month: number) {
         delete next[date];
         return next;
       }
-      return { ...prev, [date]: todos.every((t) => t.completed) };
+      return { ...prev, [date]: todos.every((t) => t.completed || t.cancelled) };
     });
   }, []);
 
