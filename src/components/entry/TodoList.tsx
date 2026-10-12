@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { addDays, subDays, format, parseISO } from 'date-fns';
-import { Check, GripVertical, Maximize2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Check, GripVertical, Maximize2, Ban, Pencil, Plus, Trash2, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -38,13 +38,14 @@ interface SortableTodoItemProps {
   todo: Todo;
   date?: string;
   onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
   onRemove: (id: string) => void;
   onEdit: (id: string, content: string) => void;
   onMove?: (id: string, targetDate: string) => void;
   onRequestCustomMove?: (id: string, entryDate: string) => void;
 }
 
-function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRequestCustomMove }: SortableTodoItemProps) {
+function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, onMove, onRequestCustomMove }: SortableTodoItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
@@ -93,8 +94,9 @@ function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRe
       </button>
       <button
         onClick={() => onToggle(todo.id, !todo.completed)}
+        disabled={todo.cancelled}
         className={[
-          'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border transition-colors',
+          'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-40',
           todo.completed
             ? 'border-primary bg-primary text-primary-foreground'
             : 'border-muted-foreground/40 bg-transparent hover:border-primary',
@@ -116,7 +118,7 @@ function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRe
       ) : (
         <span className={[
           'flex-1 text-sm leading-snug',
-          todo.completed ? 'line-through text-muted-foreground' : 'text-foreground',
+          todo.cancelled ? 'line-through text-muted-foreground/60 italic' : todo.completed ? 'line-through text-muted-foreground' : 'text-foreground',
         ].join(' ')}>
           {todo.content}
         </span>
@@ -127,6 +129,14 @@ function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRe
         aria-label="Edit task"
       >
         <Pencil className="h-3 w-3" />
+      </button>
+      <button
+        onClick={() => onCancel(todo.id, !todo.cancelled)}
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+        aria-label={todo.cancelled ? 'Restore task' : 'Cancel task'}
+        title={todo.cancelled ? 'Restore task' : 'Cancel task'}
+      >
+        {todo.cancelled ? <Undo2 className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
       </button>
       <button
         onClick={() => onRemove(todo.id)}
@@ -144,6 +154,10 @@ function SortableTodoItem({ todo, date, onToggle, onRemove, onEdit, onMove, onRe
     <ContextMenu>
       <ContextMenuTrigger>{item}</ContextMenuTrigger>
       <ContextMenuContent>
+        <ContextMenuItem onClick={() => onCancel(todo.id, !todo.cancelled)}>
+          {todo.cancelled ? 'Restore task' : 'Cancel task'}
+        </ContextMenuItem>
+        <ContextMenuSeparator />
         <ContextMenuItem onClick={() => onMove(todo.id, prevDate)}>
           Move to previous day
         </ContextMenuItem>
@@ -179,6 +193,7 @@ interface TodoListProps {
   date?: string;
   onAdd: (content: string) => Promise<void>;
   onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
   onRemove: (id: string) => void;
   onEdit: (id: string, content: string) => void;
   onReorder: (newOrder: Todo[]) => Promise<void>;
@@ -186,7 +201,7 @@ interface TodoListProps {
   onExpand?: () => void;
 }
 
-export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEdit, onReorder, onMove, onExpand }: TodoListProps) {
+export function TodoList({ todos, loading, date, onAdd, onToggle, onCancel, onRemove, onEdit, onReorder, onMove, onExpand }: TodoListProps) {
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const [customMoveTodo, setCustomMoveTodo] = useState<{ id: string; entryDate: string } | null>(null);
@@ -215,7 +230,8 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
     onReorder(arrayMove(todos, oldIndex, newIndex));
   }
 
-  const doneCount = todos.filter((t) => t.completed).length;
+  const activeTodos = todos.filter((t) => !t.cancelled);
+  const doneCount = activeTodos.filter((t) => t.completed).length;
 
   if (loading) {
     return (
@@ -233,7 +249,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
         <Label className="text-xs uppercase tracking-wide text-muted-foreground">Tasks</Label>
         <div className="flex items-center gap-1">
           {todos.length > 0 && (
-            <span className="text-xs text-muted-foreground">{doneCount}/{todos.length}</span>
+            <span className="text-xs text-muted-foreground">{doneCount}/{activeTodos.length}</span>
           )}
           {onExpand && (
             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onExpand} aria-label="Open full todo view">
@@ -253,6 +269,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onRemove, onEd
                   todo={todo}
                   date={date}
                   onToggle={onToggle}
+                  onCancel={onCancel}
                   onRemove={onRemove}
                   onEdit={onEdit}
                   onMove={onMove}
