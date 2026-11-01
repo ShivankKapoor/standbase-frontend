@@ -1,0 +1,17 @@
+services:
+  standbase-frontend:
+    build:
+      context: .
+      args:
+        # baked in at build time. Named API_URL (not VITE_API_URL) so the local dev value in .env is not picked up
+        VITE_API_URL: ${API_URL:-https://standapi.shivankkapoor.com}
+    image: standbase-frontend
+    container_name: standbase-frontend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5555}:8080"
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "10"

@@ -9,7 +9,7 @@ RUN npm install --verbose
 COPY . .
 
 # VITE_API_URL must be passed at build time:
-#   podman build --build-arg VITE_API_URL=https://standbase.shivankkapoor.com .
+#   docker build --build-arg VITE_API_URL=https://standbase.shivankkapoor.com .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 

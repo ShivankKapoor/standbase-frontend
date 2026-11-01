@@ -44,15 +44,17 @@ npm run build    # Type-check + production build → dist/
 npm run preview  # Preview the production build
 ```
 
-## Container (Podman / Docker)
+## Container (Docker)
 
 `VITE_API_URL` is baked in at build time — rebuild the image if it changes.
 
 ```bash
-VITE_API_URL=https://standbase.shivankkapoor.com ./run.sh   # Build and start on port 3000
-PORT=8080 VITE_API_URL=https://standbase.shivankkapoor.com ./run.sh  # Custom port
-./stop.sh   # Stop and remove the container
+docker compose up -d --build                 # Build and start on port 5555
+PORT=8080 docker compose up -d --build       # Custom port
+docker compose down                          # Stop and remove the container
 ```
+
+The API URL defaults to `https://standapi.shivankkapoor.com`; override it with `API_URL=... docker compose up -d --build` (`.env` is not used). The container restarts automatically (`unless-stopped`), and logs are kept by Docker's `local` driver (`docker logs -f standbase-frontend`).
 
 nginx serves the built static files. All unknown routes fall back to `index.html` for SPA routing. Hashed assets are cached for 1 year; `index.html` is never cached.
 
