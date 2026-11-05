@@ -53,7 +53,7 @@ export function EntryEditorPage() {
   }, [date]);
 
   async function handleSave() {
-    if (!date) return;
+    if (!date || !isDirty) return;
     setSaving(true);
     try {
       await createEntry(date, content, dayType);
@@ -71,7 +71,7 @@ export function EntryEditorPage() {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
-        if (!(saving)) handleSave();
+        if (!saving && isDirty) handleSave();
       }
     }
     window.addEventListener('keydown', onKeyDown);
@@ -184,7 +184,7 @@ export function EntryEditorPage() {
               </Button>
               <Button
                 onClick={handleSave}
-                disabled={saving}
+                disabled={saving || !isDirty}
                 className={isDirty ? 'bg-[#FF6319] hover:bg-[#FF6319]/90 text-white' : ''}
               >
                 {saving ? 'Saving…' : 'Save'}

@@ -93,6 +93,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
   }, [date]);
 
   async function handleSave() {
+    if (!isDirty) return;
     setSaving(true);
     try {
       await createEntry(date, content, dayType);
@@ -111,7 +112,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
     function onKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
         e.preventDefault();
-        if (!(saving || !ready || switching)) handleSave();
+        if (!(saving || !ready || switching || !isDirty)) handleSave();
       }
     }
     window.addEventListener('keydown', onKeyDown);
@@ -250,7 +251,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
         <Button
           size="sm"
           onClick={handleSave}
-          disabled={saving || !ready || switching}
+          disabled={saving || !ready || switching || !isDirty}
           className={isDirty ? 'bg-[#FF6319] hover:bg-[#FF6319]/90 text-white' : ''}
         >
           {saving ? 'Saving…' : 'Save'}
