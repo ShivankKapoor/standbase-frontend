@@ -17,7 +17,7 @@ RUN npm run build
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
 # nginx-unprivileged runs as uid 101 (non-root) on port 8080
-FROM docker.io/nginxinc/nginx-unprivileged:1.30-alpine AS runner
+FROM nginx:1.30-alpine AS runner
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
