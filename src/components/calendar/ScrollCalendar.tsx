@@ -7,6 +7,8 @@ import type { DayType } from '../../types';
 const LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTHS_BEFORE = 18;
 const MONTHS_AFTER = 18;
+// Wait for scrolling to settle before fetching, so flinging past many months costs no requests.
+const LOAD_SETTLE_MS = 150;
 
 interface MonthRef {
   year: number;
@@ -101,9 +103,10 @@ export function ScrollCalendar({ entryMap, todoSummary, selectedDate, onSelectDa
   const scrollRef = useRef<HTMLDivElement>(null);
   const blockRefs = useRef<(HTMLElement | null)[]>([]);
   const frame = useRef(0);
+  const loadTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [visibleYear, setVisibleYear] = useState(now.getFullYear());
 
-  const update = useCallback(() => {
+  const update = useCallback((settleMs: number) => {
     const scroller = scrollRef.current;
     if (!scroller) return;
     const top = scroller.scrollTop + 8;
@@ -113,10 +116,13 @@ export function ScrollCalendar({ entryMap, todoSummary, selectedDate, onSelectDa
       if (el && el.offsetTop <= top) idx = i; else break;
     }
     setVisibleYear(months[idx].year);
-    // Load what's on screen plus a little either side.
-    for (let i = Math.max(0, idx - 1); i <= Math.min(months.length - 1, idx + 2); i++) {
-      ensureMonth(months[i].year, months[i].month);
-    }
+    // Load what's on screen plus a little either side, once scrolling has settled.
+    clearTimeout(loadTimer.current);
+    loadTimer.current = setTimeout(() => {
+      for (let i = Math.max(0, idx - 1); i <= Math.min(months.length - 1, idx + 2); i++) {
+        ensureMonth(months[i].year, months[i].month);
+      }
+    }, settleMs);
   }, [months, ensureMonth]);
 
   function scrollToCurrent(smooth: boolean) {
@@ -126,15 +132,18 @@ export function ScrollCalendar({ entryMap, todoSummary, selectedDate, onSelectDa
 
   useLayoutEffect(() => {
     scrollToCurrent(false);
-    update();
+    update(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  useEffect(() => () => {
+    cancelAnimationFrame(frame.current);
+    clearTimeout(loadTimer.current);
+  }, []);
 
   function handleScroll() {
     cancelAnimationFrame(frame.current);
-    frame.current = requestAnimationFrame(update);
+    frame.current = requestAnimationFrame(() => update(LOAD_SETTLE_MS));
   }
 
   return (
