@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Toaster } from 'sonner';
 import { Header } from '../components/layout/Header';
 import { MonthCalendar } from '../components/calendar/MonthCalendar';
+import { ScrollCalendar } from '../components/calendar/ScrollCalendar';
 import { EntryPanel } from '../components/entry/EntryPanel';
 import { Drawer, DrawerContent } from '../components/ui/drawer';
-import { useEntries } from '../hooks/useEntries';
-import { useTodoSummary } from '../hooks/useTodoSummary';
+import { useCalendarData } from '../hooks/useCalendarData';
 import { useIsMobile } from '../hooks/useIsMobile';
 import type { Todo } from '../types';
 
@@ -18,8 +18,16 @@ export function DashboardPage() {
   const [closing, setClosing] = useState(false);
   const isMobile = useIsMobile();
 
-  const { entries, updateEntry, removeEntry } = useEntries(year, month);
-  const { summaryMap: todoSummaryMap, updateTodoSummary, refresh: refreshTodoSummary } = useTodoSummary(year, month);
+  const { entryMap, todoSummary, ensureMonth, updateEntry, removeEntry, updateTodoSummary, refreshTodoSummary } = useCalendarData();
+  const entries = useMemo(
+    () => Object.entries(entryMap).map(([date, dayType]) => ({ date, dayType })),
+    [entryMap],
+  );
+
+  // The paged (desktop) calendar loads the month it is showing; the scrolling one loads as you scroll.
+  useEffect(() => {
+    ensureMonth(year, month);
+  }, [year, month, ensureMonth]);
 
   function handleTodosChange(date: string, todos: Todo[]) {
     updateTodoSummary(date, todos);
@@ -73,17 +81,27 @@ export function DashboardPage() {
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <main className="flex flex-1 flex-col min-h-0">
           <div className="flex flex-1 flex-col min-h-0 mx-auto w-full max-w-screen-2xl px-2 py-2 sm:px-4 sm:py-4 px-safe pb-safe">
-            <MonthCalendar
-              year={year}
-              month={month}
-              entries={entries}
-              todoSummary={todoSummaryMap}
-              selectedDate={selectedDate}
-              onSelectDate={setSelectedDate}
-              onPrev={prevMonth}
-              onNext={nextMonth}
-              onToday={goToToday}
-            />
+            {isMobile ? (
+              <ScrollCalendar
+                entryMap={entryMap}
+                todoSummary={todoSummary}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                ensureMonth={ensureMonth}
+              />
+            ) : (
+              <MonthCalendar
+                year={year}
+                month={month}
+                entries={entries}
+                todoSummary={todoSummary}
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                onPrev={prevMonth}
+                onNext={nextMonth}
+                onToday={goToToday}
+              />
+            )}
           </div>
         </main>
 

@@ -34,7 +34,7 @@ export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType
       aria-label={`Day ${day}${hasEntry ? ', has standup' : ''}${todoStatus ? (todoStatus === 'done' ? ', tasks done' : ', tasks pending') : ''}`}
       aria-pressed={isSelected}
       className={[
-        'group relative flex h-full w-full flex-col items-center sm:items-start p-0.5 pt-1.5 sm:p-2 text-left transition-colors',
+        'group relative flex h-full w-full flex-col items-center sm:items-start p-0.5 pt-1.5 pb-1 sm:p-2 text-left transition-colors',
         isSelected ? 'sm:bg-accent sm:ring-2 sm:ring-inset sm:ring-primary' : 'sm:hover:bg-accent/40',
       ].join(' ')}
     >
