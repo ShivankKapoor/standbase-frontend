@@ -123,22 +123,23 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
       <div className="grid grid-cols-7 mb-1">
         {WEEKDAYS.map((d) => (
           <div key={d} className="py-1 sm:py-2 text-center text-[10px] sm:text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {d}
+            <span className="sm:hidden">{d[0]}</span>
+            <span className="hidden sm:inline">{d}</span>
           </div>
         ))}
       </div>
 
       <div
-        className="flex-1 min-h-0 border rounded-lg overflow-hidden bg-background touch-pan-y"
+        className="flex-1 min-h-0 border rounded-lg overflow-hidden bg-background touch-pan-y max-sm:rounded-none max-sm:border-0"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] gap-px bg-border ${slideClass}`}>
+        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] gap-px bg-border max-sm:gap-0 max-sm:bg-transparent ${slideClass}`}>
           {cells.map((day, i) => {
             const col = i % 7;
             const isWeekend = col === 0 || col === 6;
             if (!day) {
-              return <div key={i} className="bg-background" />;
+              return <div key={i} className="bg-background max-sm:border-t max-sm:border-border/60" />;
             }
             const date = toDateStr(year, month, day);
             const hasTodo = date in todoSummary;
@@ -146,7 +147,7 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
             return (
               <div
                 key={date}
-                className="h-full bg-background"
+                className="h-full bg-background max-sm:border-t max-sm:border-border/60"
                 onContextMenu={(e) => {
                   e.preventDefault();
                   setContextMenu({ date, x: e.clientX, y: e.clientY });
