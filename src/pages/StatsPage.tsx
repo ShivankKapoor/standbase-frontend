@@ -33,7 +33,7 @@ export function StatsPage() {
   return (
     <div className="min-h-dvh bg-background">
       <Header />
-      <main className="mx-auto w-full max-w-screen-2xl px-4 py-6">
+      <main className="mx-auto w-full max-w-screen-2xl px-3 py-4 sm:px-4 sm:py-6 px-safe pb-safe">
         <div className="mb-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" aria-label="Back to calendar" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4" />

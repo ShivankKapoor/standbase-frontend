@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { buildHeatmapWeeks, type HeatmapBucket, type HeatmapCell } from '../../lib/heatmap';
 import type { HeatMapEntry } from '../../types';
@@ -57,9 +57,17 @@ export function HeatmapCalendar({ entries }: HeatmapCalendarProps) {
   const weeks = useMemo(() => buildHeatmapWeeks(entries, today), [entries, today]);
   const monthLabels = useMemo(() => getMonthLabels(weeks), [weeks]);
   const cellSize = useCellSize(containerRef, weeks.length);
+  const [selected, setSelected] = useState<HeatmapCell | null>(null);
+
+  // Start scrolled to the most recent weeks when the grid overflows (phones).
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [weeks.length, cellSize]);
 
   return (
-    <div ref={containerRef} className="flex w-full overflow-x-auto overflow-y-visible pb-2">
+    <div>
+    <div ref={containerRef} className="flex w-full overflow-x-auto overflow-y-visible pb-2 no-scrollbar">
       <div className="m-auto flex flex-col gap-1">
         <div className="flex gap-1">
           {monthLabels.map((label, i) => (
@@ -72,7 +80,12 @@ export function HeatmapCalendar({ entries }: HeatmapCalendarProps) {
           {weeks.map((week, wi) => (
             <div key={wi} className="flex flex-col gap-1">
               {week.map((cell, di) => (
-                <div key={di} className="group relative" style={{ width: cellSize, height: cellSize }}>
+                <div
+                  key={di}
+                  className="group relative"
+                  style={{ width: cellSize, height: cellSize }}
+                  onClick={() => cell && setSelected(cell)}
+                >
                   {cell && (
                     <>
                       <div
@@ -81,7 +94,7 @@ export function HeatmapCalendar({ entries }: HeatmapCalendarProps) {
                           BUCKET_CLASS[cell.bucket],
                         ].join(' ')}
                       />
-                      <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 translate-y-1 scale-90 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-all duration-150 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
+                      <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 pointer-coarse:hidden -translate-x-1/2 translate-y-1 scale-90 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-all duration-150 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
                         <span className="font-medium">{format(parseISO(cell.date), 'EEEE, MMM d, yyyy')}</span>
                         <span className="text-muted-foreground"> · {cell.wordCount} word{cell.wordCount === 1 ? '' : 's'}</span>
                       </div>
@@ -93,6 +106,17 @@ export function HeatmapCalendar({ entries }: HeatmapCalendarProps) {
           ))}
         </div>
       </div>
+    </div>
+      <p className="mt-2 hidden min-h-5 text-sm pointer-coarse:block" aria-live="polite">
+        {selected ? (
+          <>
+            <span className="font-medium">{format(parseISO(selected.date), 'EEEE, MMM d, yyyy')}</span>
+            <span className="text-muted-foreground"> · {selected.wordCount} word{selected.wordCount === 1 ? '' : 's'}</span>
+          </>
+        ) : (
+          <span className="text-muted-foreground">Tap a day to see its word count</span>
+        )}
+      </p>
     </div>
   );
 }

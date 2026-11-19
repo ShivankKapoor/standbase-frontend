@@ -20,29 +20,37 @@ interface DayCellProps {
 export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType, todoStatus, onClick }: DayCellProps) {
   const entryDot = hasEntry
     ? dayType
-      ? <span className={`h-1.5 w-1.5 rounded-full ${dotColour[dayType]}`} />
-      : <span className="h-1.5 w-1.5 rounded-full bg-[#FF6319]" />
+      ? <span className={`h-2 w-2 sm:h-1.5 sm:w-1.5 rounded-full ${dotColour[dayType]}`} />
+      : <span className="h-2 w-2 sm:h-1.5 sm:w-1.5 rounded-full bg-[#FF6319]" />
     : null;
 
   const todoDot = todoStatus
-    ? <span className={`h-1.5 w-1.5 rounded-sm ${todoStatus === 'done' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+    ? <span className={`h-2 w-2 sm:h-1.5 sm:w-1.5 rounded-sm ${todoStatus === 'done' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
     : null;
 
   return (
     <button
       onClick={onClick}
+      aria-label={`Day ${day}${hasEntry ? ', has standup' : ''}${todoStatus ? (todoStatus === 'done' ? ', tasks done' : ', tasks pending') : ''}`}
+      aria-pressed={isSelected}
       className={[
-        'group relative flex h-full w-full flex-col items-start p-1 sm:p-2 text-left transition-colors',
-        isSelected ? 'bg-accent ring-2 ring-inset ring-primary' : 'hover:bg-accent/40',
+        'group relative flex h-full w-full flex-col items-center sm:items-start p-0.5 pt-1.5 pb-1 sm:p-2 text-left transition-colors',
+        isSelected ? 'sm:bg-accent sm:ring-2 sm:ring-inset sm:ring-primary' : 'sm:hover:bg-accent/40',
       ].join(' ')}
     >
       <span className={[
-        'flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium',
-        isToday ? 'bg-primary text-primary-foreground' : isWeekend ? 'text-muted-foreground/50' : 'text-foreground',
+        'flex h-9 w-9 sm:h-7 sm:w-7 items-center justify-center rounded-full text-base sm:text-sm font-medium transition-colors',
+        isToday
+          ? 'bg-primary text-primary-foreground'
+          : isSelected
+            ? 'max-sm:bg-foreground max-sm:text-background'
+            : '',
+        !isToday && !isSelected ? (isWeekend ? 'text-muted-foreground/50' : 'text-foreground') : '',
+        isToday && isSelected ? 'max-sm:ring-2 max-sm:ring-foreground max-sm:ring-offset-2 max-sm:ring-offset-background' : '',
       ].join(' ')}>
         {day}
       </span>
-      <div className="mt-1 flex flex-col gap-0.5">
+      <div className="mt-1 flex h-2 flex-row items-center gap-1 sm:h-auto sm:flex-col sm:items-start sm:gap-0.5">
         {entryDot}
         {todoDot}
       </div>

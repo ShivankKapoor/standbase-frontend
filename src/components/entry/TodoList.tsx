@@ -18,11 +18,12 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { addDays, subDays, format, parseISO } from 'date-fns';
-import { Check, GripVertical, Maximize2, Ban, Pencil, Plus, Trash2, Undo2 } from 'lucide-react';
+import { Check, EllipsisVertical, GripVertical, Maximize2, Ban, Pencil, Plus, Trash2, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { TodoActionSheet } from './TodoActionSheet';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -49,6 +50,7 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: todo.id });
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(todo.content);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -82,28 +84,32 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
-      className="group flex items-center gap-2 rounded px-1 py-1 hover:bg-muted/40"
+      className="group flex items-center gap-1 rounded px-1 py-1 hover:bg-muted/40 pointer-coarse:py-0"
     >
       <button
-        className="shrink-0 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
+        className="flex shrink-0 cursor-grab touch-none items-center justify-center text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing pointer-coarse:h-11 pointer-coarse:w-9"
         aria-label="Drag to reorder"
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="h-3.5 w-3.5" />
+        <GripVertical className="h-3.5 w-3.5 pointer-coarse:h-5 pointer-coarse:w-5" />
       </button>
       <button
         onClick={() => onToggle(todo.id, !todo.completed)}
         disabled={todo.cancelled}
-        className={[
-          'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-          todo.completed
-            ? 'border-primary bg-primary text-primary-foreground'
-            : 'border-muted-foreground/40 bg-transparent hover:border-primary',
-        ].join(' ')}
+        className="group/check flex h-5 w-5 shrink-0 items-center justify-center disabled:cursor-not-allowed disabled:opacity-40 pointer-coarse:h-11 pointer-coarse:w-11"
         aria-label={todo.completed ? 'Mark incomplete' : 'Mark complete'}
       >
-        {todo.completed && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+        <span
+          className={[
+            'flex h-3.5 w-3.5 items-center justify-center rounded-full border transition-colors pointer-coarse:h-6 pointer-coarse:w-6',
+            todo.completed
+              ? 'border-primary bg-primary text-primary-foreground'
+              : 'border-muted-foreground/40 bg-transparent group-hover/check:border-primary',
+          ].join(' ')}
+        >
+          {todo.completed && <Check className="h-2.5 w-2.5 pointer-coarse:h-4 pointer-coarse:w-4" strokeWidth={3} />}
+        </span>
       </button>
       {editing ? (
         <input
@@ -113,11 +119,11 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
           onBlur={commitEdit}
           onKeyDown={handleEditKeyDown}
           maxLength={500}
-          className="flex-1 rounded border border-input bg-transparent px-1 text-sm leading-snug outline-none focus:border-primary"
+          className="min-w-0 flex-1 rounded border border-input bg-transparent px-1 text-sm leading-snug outline-none focus:border-primary pointer-coarse:h-10 pointer-coarse:px-2"
         />
       ) : (
         <span className={[
-          'flex-1 text-sm leading-snug',
+          'min-w-0 flex-1 break-words text-sm leading-snug pointer-coarse:py-2 pointer-coarse:text-base',
           todo.cancelled ? 'line-through text-muted-foreground/60 italic' : todo.completed ? 'line-through text-muted-foreground' : 'text-foreground',
         ].join(' ')}>
           {todo.content}
@@ -125,14 +131,14 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
       )}
       <button
         onClick={() => setEditing(true)}
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 pointer-coarse:hidden text-muted-foreground hover:text-foreground"
         aria-label="Edit task"
       >
         <Pencil className="h-3 w-3" />
       </button>
       <button
         onClick={() => onCancel(todo.id, !todo.cancelled)}
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 pointer-coarse:hidden text-muted-foreground hover:text-foreground"
         aria-label={todo.cancelled ? 'Restore task' : 'Cancel task'}
         title={todo.cancelled ? 'Restore task' : 'Cancel task'}
       >
@@ -140,17 +146,40 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
       </button>
       <button
         onClick={() => onRemove(todo.id)}
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-destructive"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 pointer-coarse:hidden text-muted-foreground hover:text-destructive"
         aria-label="Delete task"
       >
         <Trash2 className="h-3 w-3" />
       </button>
+      <button
+        onClick={() => setSheetOpen(true)}
+        className="hidden h-11 w-11 shrink-0 items-center justify-center rounded text-muted-foreground active:bg-accent pointer-coarse:flex"
+        aria-label="Task actions"
+      >
+        <EllipsisVertical className="h-5 w-5" />
+      </button>
     </li>
   );
 
-  if (!onMove || !prevDate || !nextDate) return item;
+  const sheet = (
+    <TodoActionSheet
+      todo={todo}
+      open={sheetOpen}
+      onOpenChange={setSheetOpen}
+      moveTargets={prevDate && nextDate ? { prevDate, nextDate, nextMonday, prevFriday } : null}
+      onEdit={() => setEditing(true)}
+      onCancel={() => onCancel(todo.id, !todo.cancelled)}
+      onRemove={() => onRemove(todo.id)}
+      onMove={onMove ? (target) => onMove(todo.id, target) : undefined}
+      onRequestCustomMove={onRequestCustomMove ? () => onRequestCustomMove(todo.id, todo.entryDate) : undefined}
+    />
+  );
+
+  if (!onMove || !prevDate || !nextDate) return <>{item}{sheet}</>;
 
   return (
+    <>
+    {sheet}
     <ContextMenu>
       <ContextMenuTrigger>{item}</ContextMenuTrigger>
       <ContextMenuContent>
@@ -184,6 +213,7 @@ function SortableTodoItem({ todo, date, onToggle, onCancel, onRemove, onEdit, on
         )}
       </ContextMenuContent>
     </ContextMenu>
+    </>
   );
 }
 
@@ -207,7 +237,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onCancel, onRe
   const [customMoveTodo, setCustomMoveTodo] = useState<{ id: string; entryDate: string } | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
@@ -252,7 +282,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onCancel, onRe
             <span className="text-xs text-muted-foreground">{doneCount}/{activeTodos.length}</span>
           )}
           {onExpand && (
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onExpand} aria-label="Open full todo view">
+            <Button variant="ghost" size="icon" className="h-6 w-6 pointer-coarse:h-10 pointer-coarse:w-10" onClick={onExpand} aria-label="Open full todo view">
               <Maximize2 className="h-3.5 w-3.5" />
             </Button>
           )}
@@ -288,13 +318,13 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onCancel, onRe
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Add a task…"
-          className="h-7 text-sm"
+          className="h-7 text-sm pointer-coarse:h-11"
           maxLength={500}
         />
         <Button
           size="icon"
           variant="ghost"
-          className="h-7 w-7 shrink-0"
+          className="h-7 w-7 shrink-0 pointer-coarse:h-11 pointer-coarse:w-11"
           onClick={handleAdd}
           disabled={!input.trim()}
         >
@@ -303,7 +333,7 @@ export function TodoList({ todos, loading, date, onAdd, onToggle, onCancel, onRe
       </div>
 
       <Dialog open={customMoveTodo !== null} onOpenChange={(open) => { if (!open) setCustomMoveTodo(null); }}>
-        <DialogContent showCloseButton={false} className="w-fit p-4">
+        <DialogContent showCloseButton={false} className="w-fit p-2 sm:p-4">
           <DialogHeader>
             <DialogTitle>Move to date</DialogTitle>
           </DialogHeader>

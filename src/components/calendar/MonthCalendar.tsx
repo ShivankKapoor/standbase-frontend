@@ -36,6 +36,23 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
   const entryMap = new Map(entries.map((e) => [e.date, e.dayType]));
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  // Horizontal swipe on the grid changes month (mobile).
+  function handleTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }
+  function handleTouchEnd(e: React.TouchEvent) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0) onNext(); else onPrev();
+  }
 
   // Track which way the month changed so the grid slides in from the matching side.
   const monthKey = year * 12 + month;
@@ -86,16 +103,16 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
 
   return (
     <div className="flex flex-1 flex-col min-h-0 animate-fade-in">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between sm:mb-4">
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={onPrev}>
+          <Button variant="ghost" size="icon" onClick={onPrev} aria-label="Previous month">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onNext}>
+          <Button variant="ghost" size="icon" onClick={onNext} aria-label="Next month">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <h2 key={monthKey} className={`text-xl font-semibold ${direction ? 'animate-fade-in' : ''}`}>
+        <h2 key={monthKey} className={`text-lg sm:text-xl font-semibold ${direction ? 'animate-fade-in' : ''}`}>
           {format(firstDay, 'MMMM yyyy')}
         </h2>
         <Button variant="outline" size="sm" className="text-xs" onClick={onToday}>
@@ -105,19 +122,24 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
 
       <div className="grid grid-cols-7 mb-1">
         {WEEKDAYS.map((d) => (
-          <div key={d} className="py-2 text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {d}
+          <div key={d} className="py-1 sm:py-2 text-center text-[10px] sm:text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <span className="sm:hidden">{d[0]}</span>
+            <span className="hidden sm:inline">{d}</span>
           </div>
         ))}
       </div>
 
-      <div className="flex-1 min-h-0 border rounded-lg overflow-hidden bg-background">
-        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] gap-px bg-border ${slideClass}`}>
+      <div
+        className="flex-1 min-h-0 border rounded-lg overflow-hidden bg-background touch-pan-y max-sm:rounded-none max-sm:border-0"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] gap-px bg-border max-sm:gap-0 max-sm:bg-transparent ${slideClass}`}>
           {cells.map((day, i) => {
             const col = i % 7;
             const isWeekend = col === 0 || col === 6;
             if (!day) {
-              return <div key={i} className="bg-background" />;
+              return <div key={i} className="bg-background max-sm:border-t max-sm:border-border/60" />;
             }
             const date = toDateStr(year, month, day);
             const hasTodo = date in todoSummary;
@@ -125,7 +147,7 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
             return (
               <div
                 key={date}
-                className="h-full bg-background"
+                className="h-full bg-background max-sm:border-t max-sm:border-border/60"
                 onContextMenu={(e) => {
                   e.preventDefault();
                   setContextMenu({ date, x: e.clientX, y: e.clientY });

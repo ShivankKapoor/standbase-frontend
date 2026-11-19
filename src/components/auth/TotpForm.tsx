@@ -95,12 +95,12 @@ export function TotpForm({ preAuthToken, onSuccess, onBack }: TotpFormProps) {
         Enter the 6-digit code from your authenticator app.
       </p>
 
-      <div className={`flex justify-center gap-2 ${shake ? 'animate-otp-shake' : ''}`}>
+      <div className={`flex w-full justify-center gap-1.5 sm:gap-2 ${shake ? 'animate-otp-shake' : ''}`}>
         {digits.map((digit, idx) => (
           <div
             key={idx}
             className={[
-              'relative h-14 w-11 overflow-hidden rounded-lg border-2 transition-colors duration-150',
+              'relative h-12 min-w-0 max-w-11 flex-1 overflow-hidden sm:h-14 rounded-lg border-2 transition-colors duration-150',
               focused === idx
                 ? 'border-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.2)]'
                 : digit

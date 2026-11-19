@@ -7,12 +7,25 @@ import { ThemeToggle } from '../components/layout/ThemeToggle';
 import { checkSession } from '../api/auth';
 import { useAuthContext } from '../context/AuthContext';
 
+// Survives a page reload (e.g. the browser reloading after you switch to your authenticator app).
+// sessionStorage is per-tab and cleared when the tab closes.
+const PRE_AUTH_KEY = 'pre_auth_token';
+
 export function LoginPage() {
   const { setAuth } = useAuthContext();
   const navigate = useNavigate();
-  const [preAuthToken, setPreAuthToken] = useState<string | null>(null);
+  const [preAuthToken, setPreAuthTokenState] = useState<string | null>(
+    () => sessionStorage.getItem(PRE_AUTH_KEY),
+  );
+
+  function setPreAuthToken(token: string | null) {
+    if (token) sessionStorage.setItem(PRE_AUTH_KEY, token);
+    else sessionStorage.removeItem(PRE_AUTH_KEY);
+    setPreAuthTokenState(token);
+  }
 
   async function handleSuccess(token: string) {
+    sessionStorage.removeItem(PRE_AUTH_KEY);
     localStorage.setItem('session_token', token);
     const session = await checkSession();
     setAuth(token, session.userName);
@@ -20,8 +33,8 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="absolute top-4 right-4">
+    <div className="relative flex min-h-dvh items-center justify-center bg-background px-4">
+      <div className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-sm -mt-10 animate-fade-in space-y-6">
@@ -35,7 +48,7 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
+          <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-6">
             {preAuthToken ? (
               <TotpForm
                 preAuthToken={preAuthToken}
