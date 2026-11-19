@@ -20,8 +20,8 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="absolute top-4 right-4">
+    <div className="relative flex min-h-dvh items-center justify-center bg-background px-4">
+      <div className="absolute top-[max(1rem,env(safe-area-inset-top))] right-4">
         <ThemeToggle />
       </div>
       <div className="w-full max-w-sm -mt-10 animate-fade-in space-y-6">
@@ -35,7 +35,7 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border bg-card p-6 shadow-sm">
+          <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-6">
             {preAuthToken ? (
               <TotpForm
                 preAuthToken={preAuthToken}

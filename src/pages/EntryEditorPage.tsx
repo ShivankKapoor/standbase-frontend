@@ -92,12 +92,12 @@ export function EntryEditorPage() {
   const parsedDate = date ? parseISO(date) : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-background">
       <Header />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-6">
-        <div className="mb-6 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => isDirty ? setShowDiscard(true) : navigate('/')}>
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-3 py-4 sm:px-4 sm:py-6 px-safe">
+        <div className="mb-4 flex items-center gap-3 sm:mb-6">
+          <Button variant="ghost" size="icon" aria-label="Back to calendar" onClick={() => isDirty ? setShowDiscard(true) : navigate('/')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1">
@@ -129,7 +129,7 @@ export function EntryEditorPage() {
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">Day type</Label>
               <Select value={dayType ?? 'none'} onValueChange={(v) => setDayType(v === 'none' ? null : v as DayType)}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue>
                     {dayType ? <DayTypeBadge dayType={dayType} /> : <span className="text-muted-foreground">None</span>}
                   </SelectValue>
@@ -159,7 +159,7 @@ export function EntryEditorPage() {
                 </Button>
               </div>
               <Textarea
-                className="min-h-96 flex-1 resize-none text-sm" style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                className="min-h-64 flex-1 resize-none text-sm sm:min-h-96" style={{ fontFamily: "'IBM Plex Mono', monospace" }}
                 placeholder="What did you work on?"
                 maxLength={2000}
                 value={content}
@@ -171,7 +171,7 @@ export function EntryEditorPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t pt-4">
+            <div className="sticky bottom-0 -mx-3 flex items-center justify-between border-t bg-background/95 px-3 pt-3 pb-safe-3 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:px-0 sm:pt-4 sm:pb-0 sm:backdrop-blur-none">
               <Button
                 variant="ghost"
                 size="sm"
@@ -194,7 +194,7 @@ export function EntryEditorPage() {
         )}
       </main>
 
-      <Toaster richColors position="bottom-center" />
+      <Toaster richColors position="bottom-center" mobileOffset={{ bottom: 'max(5rem, env(safe-area-inset-bottom))' }} />
 
       <AlertDialog open={showTemplateConfirm} onOpenChange={setShowTemplateConfirm}>
         <AlertDialogContent>

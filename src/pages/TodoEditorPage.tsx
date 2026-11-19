@@ -16,12 +16,12 @@ export function TodoEditorPage() {
   const parsedDate = date ? parseISO(date) : null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-dvh flex-col bg-background">
       <Header />
 
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-6">
-        <div className="mb-6 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-3 py-4 sm:px-4 sm:py-6 px-safe pb-safe">
+        <div className="mb-4 flex items-center gap-3 sm:mb-6">
+          <Button variant="ghost" size="icon" aria-label="Back to calendar" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
@@ -48,7 +48,7 @@ export function TodoEditorPage() {
         />
       </main>
 
-      <Toaster richColors position="bottom-center" />
+      <Toaster richColors position="bottom-center" mobileOffset={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }} />
     </div>
   );
 }

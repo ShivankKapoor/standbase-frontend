@@ -45,6 +45,27 @@ export function PresentEntryPage() {
       .finally(() => setLoading(false));
   }, [date]);
 
+  // Keep the screen awake while presenting (where supported).
+  useEffect(() => {
+    let lock: WakeLockSentinel | null = null;
+    async function acquire() {
+      try {
+        lock = (await navigator.wakeLock?.request('screen')) ?? null;
+      } catch {
+        /* denied or unsupported */
+      }
+    }
+    function onVisibility() {
+      if (document.visibilityState === 'visible') void acquire();
+    }
+    void acquire();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      void lock?.release();
+    };
+  }, []);
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') navigate(-1);
@@ -58,8 +79,8 @@ export function PresentEntryPage() {
   const parsedDate = date ? parseISO(date) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background">
-      <div className="flex items-center justify-between border-b px-4 py-3">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background pt-safe px-safe">
+      <div className="flex items-center justify-between border-b px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex flex-col">
           <span className="text-sm font-semibold">
             {parsedDate ? format(parsedDate, 'EEEE') : ''}
@@ -103,12 +124,12 @@ export function PresentEntryPage() {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-auto px-8 py-10">
+      <div className="flex flex-1 overflow-auto px-4 py-6 pb-safe-4 sm:px-8 sm:py-10">
         {loading ? (
           <div className="m-auto h-10 w-64 animate-pulse rounded bg-muted" />
         ) : content.trim() ? (
           <p
-            className="m-auto w-full max-w-7xl whitespace-pre-wrap text-center font-bold leading-snug tracking-wide"
+            className="m-auto w-full max-w-7xl whitespace-pre-wrap break-words text-center font-bold leading-snug tracking-wide"
             style={{
               fontSize: `${fontSize}rem`,
               fontFamily: dyslexicFont ? "'OpenDyslexic', sans-serif" : undefined,
