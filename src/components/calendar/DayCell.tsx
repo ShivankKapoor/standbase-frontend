@@ -20,29 +20,31 @@ interface DayCellProps {
 export function DayCell({ day, isToday, isSelected, isWeekend, hasEntry, dayType, todoStatus, onClick }: DayCellProps) {
   const entryDot = hasEntry
     ? dayType
-      ? <span className={`h-1.5 w-1.5 rounded-full ${dotColour[dayType]}`} />
-      : <span className="h-1.5 w-1.5 rounded-full bg-[#FF6319]" />
+      ? <span className={`h-2 w-2 sm:h-1.5 sm:w-1.5 rounded-full ${dotColour[dayType]}`} />
+      : <span className="h-2 w-2 sm:h-1.5 sm:w-1.5 rounded-full bg-[#FF6319]" />
     : null;
 
   const todoDot = todoStatus
-    ? <span className={`h-1.5 w-1.5 rounded-sm ${todoStatus === 'done' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+    ? <span className={`h-2 w-2 sm:h-1.5 sm:w-1.5 rounded-sm ${todoStatus === 'done' ? 'bg-emerald-500' : 'bg-amber-400'}`} />
     : null;
 
   return (
     <button
       onClick={onClick}
+      aria-label={`Day ${day}${hasEntry ? ', has standup' : ''}${todoStatus ? (todoStatus === 'done' ? ', tasks done' : ', tasks pending') : ''}`}
+      aria-pressed={isSelected}
       className={[
-        'group relative flex h-full w-full flex-col items-start p-1 sm:p-2 text-left transition-colors',
+        'group relative flex h-full w-full flex-col items-center sm:items-start p-0.5 pt-1 sm:p-2 text-left transition-colors',
         isSelected ? 'bg-accent ring-2 ring-inset ring-primary' : 'hover:bg-accent/40',
       ].join(' ')}
     >
       <span className={[
-        'flex h-7 w-7 items-center justify-center rounded-full text-sm font-medium',
+        'flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs sm:text-sm font-medium',
         isToday ? 'bg-primary text-primary-foreground' : isWeekend ? 'text-muted-foreground/50' : 'text-foreground',
       ].join(' ')}>
         {day}
       </span>
-      <div className="mt-1 flex flex-col gap-0.5">
+      <div className="mt-1 flex flex-row items-center gap-1 sm:flex-col sm:items-start sm:gap-0.5">
         {entryDot}
         {todoDot}
       </div>

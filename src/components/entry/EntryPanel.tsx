@@ -131,7 +131,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
   }
 
   return (
-    <div className="flex h-full flex-col bg-card animate-fade-in">
+    <div className="flex h-full min-h-0 flex-col bg-card animate-fade-in">
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div key={displayDate} className="flex flex-col animate-fade-in">
           <span className="text-sm font-semibold">
@@ -154,7 +154,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
           <Button variant="ghost" size="icon" onClick={() => navigate(`/entry/${date}`, { state: { draft: { content, dayType }, saved: { content: savedContent, dayType: savedDayType } } })} aria-label="Open full editor" disabled={switching}>
             <Maximize2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => guardUnsaved(onClose)}>
+          <Button variant="ghost" size="icon" onClick={() => guardUnsaved(onClose)} aria-label="Close">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -237,7 +237,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
         )}
       </div>
 
-      <div className="flex items-center justify-between border-t px-4 py-3">
+      <div className="flex items-center justify-between border-t px-4 py-3 pb-safe-3">
         <Button
           variant="ghost"
           size="sm"

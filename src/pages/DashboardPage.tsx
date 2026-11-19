@@ -72,7 +72,7 @@ export function DashboardPage() {
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <main className="flex flex-1 flex-col min-h-0">
-          <div className="flex flex-1 flex-col min-h-0 mx-auto w-full max-w-screen-2xl px-4 py-4">
+          <div className="flex flex-1 flex-col min-h-0 mx-auto w-full max-w-screen-2xl px-2 py-2 sm:px-4 sm:py-4 px-safe pb-safe">
             <MonthCalendar
               year={year}
               month={month}
@@ -115,7 +115,7 @@ export function DashboardPage() {
       {/* Mobile: bottom drawer */}
       {isMobile && (
         <Drawer open={!!selectedDate} onOpenChange={(open) => { if (!open) { setSelectedDate(null); setPanelDate(null); } }}>
-          <DrawerContent className="max-h-[90dvh]">
+          <DrawerContent className="h-[88dvh] max-h-[88dvh]">
             {panelDate && (
               <EntryPanel
                 date={panelDate}
@@ -130,7 +130,7 @@ export function DashboardPage() {
         </Drawer>
       )}
 
-      <Toaster richColors position="bottom-center" />
+      <Toaster richColors position="bottom-center" offset={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }} mobileOffset={{ bottom: 'max(1rem, env(safe-area-inset-bottom))' }} />
     </div>
   );
 }
