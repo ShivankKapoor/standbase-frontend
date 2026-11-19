@@ -134,12 +134,12 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] max-sm:h-auto max-sm:[grid-auto-rows:auto] gap-px bg-border max-sm:gap-0 max-sm:bg-transparent ${slideClass}`}>
+        <div key={monthKey} className={`grid h-full grid-cols-7 [grid-auto-rows:1fr] gap-px bg-border max-sm:gap-0 max-sm:bg-transparent ${slideClass}`}>
           {cells.map((day, i) => {
             const col = i % 7;
             const isWeekend = col === 0 || col === 6;
             if (!day) {
-              return <div key={i} className="bg-background" />;
+              return <div key={i} className="bg-background max-sm:border-t max-sm:border-border/60" />;
             }
             const date = toDateStr(year, month, day);
             const hasTodo = date in todoSummary;
@@ -147,7 +147,7 @@ export function MonthCalendar({ year, month, entries, todoSummary, selectedDate,
             return (
               <div
                 key={date}
-                className="h-full bg-background max-sm:h-auto"
+                className="h-full bg-background max-sm:border-t max-sm:border-border/60"
                 onContextMenu={(e) => {
                   e.preventDefault();
                   setContextMenu({ date, x: e.clientX, y: e.clientY });
