@@ -1,5 +1,5 @@
 import { addDays, format, parseISO, subDays } from 'date-fns';
-import type { HeatMapEntry } from '../types';
+import type { DayType, HeatMapEntry } from '../types';
 
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -14,6 +14,7 @@ export interface HeatmapDay {
   date: string;
   wordCount: number;
   bucket: HeatmapBucket;
+  dayType: DayType | null;
 }
 
 /** null marks a padding cell outside the date range, used to align the grid to week rows. */
@@ -51,7 +52,7 @@ export function getBucket(wordCount: number, [q1, q2, q3]: [number, number, numb
  * since the heatmap needs every day represented to show gaps.
  */
 export function buildHeatmapWeeks(entries: HeatMapEntry[], today: Date): HeatmapCell[][] {
-  const wordCountByDate = new Map(entries.map((e) => [e.entryDate, e.wordCount]));
+  const entryByDate = new Map(entries.map((e) => [e.entryDate, e]));
   const thresholds = computeQuartileThresholds(entries);
 
   const start = subDays(today, 364);
@@ -59,8 +60,9 @@ export function buildHeatmapWeeks(entries: HeatMapEntry[], today: Date): Heatmap
 
   for (let i = 0; i <= 364; i++) {
     const date = format(addDays(start, i), 'yyyy-MM-dd');
-    const wordCount = wordCountByDate.get(date) ?? 0;
-    days.push({ date, wordCount, bucket: getBucket(wordCount, thresholds) });
+    const entry = entryByDate.get(date);
+    const wordCount = entry?.wordCount ?? 0;
+    days.push({ date, wordCount, bucket: getBucket(wordCount, thresholds), dayType: entry?.dayType ?? null });
   }
   while (days.length % 7 !== 0) days.push(null);
 

@@ -40,6 +40,7 @@ export interface TodoSummary {
 export interface HeatMapEntry {
   entryDate: string;
   wordCount: number;
+  dayType: DayType | null;
 }
 
 export interface HeatMapResponse {

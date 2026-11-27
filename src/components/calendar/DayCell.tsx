@@ -1,8 +1,8 @@
 import type { DayType } from '../../types';
 
 const dotColour: Record<DayType, string> = {
-  PTO:      'bg-sky-500',
-  PLANNING: 'bg-violet-500',
+  PTO:      'bg-green-500',
+  PLANNING: 'bg-pink-400',
   SUPPORT:  'bg-yellow-400',
   MISSED:   'bg-red-500',
 };

@@ -1,15 +1,15 @@
 import type { DayType } from '../../types';
 
 const styles: Record<DayType, string> = {
-  PTO:      'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400',
-  PLANNING: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400',
+  PTO:      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  PLANNING: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
   SUPPORT:  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
   MISSED:   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 };
 
 const dotStyles: Record<DayType, string> = {
-  PTO:      'bg-sky-500',
-  PLANNING: 'bg-violet-500',
+  PTO:      'bg-green-500',
+  PLANNING: 'bg-pink-400',
   SUPPORT:  'bg-yellow-400',
   MISSED:   'bg-red-500',
 };

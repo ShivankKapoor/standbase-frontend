@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { buildHeatmapWeeks, type HeatmapBucket, type HeatmapCell } from '../../lib/heatmap';
+import { dayTypeDotStyles } from '../entry/DayTypeBadge';
 import type { HeatMapEntry } from '../../types';
 
 interface HeatmapCalendarProps {
@@ -91,12 +92,13 @@ export function HeatmapCalendar({ entries }: HeatmapCalendarProps) {
                       <div
                         className={[
                           'absolute inset-0 rounded-full transition-transform duration-150 ease-out group-hover:scale-150',
-                          BUCKET_CLASS[cell.bucket],
+                          // A day type takes priority over the word-count shade.
+                          cell.dayType ? dayTypeDotStyles[cell.dayType] : BUCKET_CLASS[cell.bucket],
                         ].join(' ')}
                       />
                       <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 pointer-coarse:hidden -translate-x-1/2 translate-y-1 scale-90 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-all duration-150 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
                         <span className="font-medium">{format(parseISO(cell.date), 'EEEE, MMM d, yyyy')}</span>
-                        <span className="text-muted-foreground"> · {cell.wordCount} word{cell.wordCount === 1 ? '' : 's'}</span>
+                        <span className="text-muted-foreground"> · {cell.wordCount} word{cell.wordCount === 1 ? '' : 's'}{cell.dayType && ` · ${cell.dayType}`}</span>
                       </div>
                     </>
                   )}
@@ -111,7 +113,7 @@ export function HeatmapCalendar({ entries }: HeatmapCalendarProps) {
         {selected ? (
           <>
             <span className="font-medium">{format(parseISO(selected.date), 'EEEE, MMM d, yyyy')}</span>
-            <span className="text-muted-foreground"> · {selected.wordCount} word{selected.wordCount === 1 ? '' : 's'}</span>
+            <span className="text-muted-foreground"> · {selected.wordCount} word{selected.wordCount === 1 ? '' : 's'}{selected.dayType && ` · ${selected.dayType}`}</span>
           </>
         ) : (
           <span className="text-muted-foreground">Tap a day to see its word count</span>
