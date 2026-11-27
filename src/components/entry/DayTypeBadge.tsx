@@ -3,13 +3,15 @@ import type { DayType } from '../../types';
 const styles: Record<DayType, string> = {
   PTO:      'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400',
   PLANNING: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400',
-  SUPPORT:  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  SUPPORT:  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  MISSED:   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 };
 
 const dotStyles: Record<DayType, string> = {
   PTO:      'bg-sky-500',
   PLANNING: 'bg-violet-500',
-  SUPPORT:  'bg-red-500',
+  SUPPORT:  'bg-yellow-400',
+  MISSED:   'bg-red-500',
 };
 
 export function DayTypeBadge({ dayType }: { dayType: DayType }) {

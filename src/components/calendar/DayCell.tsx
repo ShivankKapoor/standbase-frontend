@@ -3,7 +3,8 @@ import type { DayType } from '../../types';
 const dotColour: Record<DayType, string> = {
   PTO:      'bg-sky-500',
   PLANNING: 'bg-violet-500',
-  SUPPORT:  'bg-red-500',
+  SUPPORT:  'bg-yellow-400',
+  MISSED:   'bg-red-500',
 };
 
 interface DayCellProps {

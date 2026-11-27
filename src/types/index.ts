@@ -1,4 +1,4 @@
-export type DayType = 'PTO' | 'PLANNING' | 'SUPPORT';
+export type DayType = 'PTO' | 'PLANNING' | 'SUPPORT' | 'MISSED';
 
 export interface EntryOverview {
   date: string;
