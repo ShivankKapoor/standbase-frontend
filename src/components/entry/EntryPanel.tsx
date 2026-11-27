@@ -188,6 +188,7 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
                   <SelectItem value="PTO"><DayTypeBadge dayType="PTO" /></SelectItem>
                   <SelectItem value="PLANNING"><DayTypeBadge dayType="PLANNING" /></SelectItem>
                   <SelectItem value="SUPPORT"><DayTypeBadge dayType="SUPPORT" /></SelectItem>
+                  <SelectItem value="MISSED"><DayTypeBadge dayType="MISSED" /></SelectItem>
                 </SelectContent>
               </Select>
             </div>

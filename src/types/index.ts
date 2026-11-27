@@ -1,4 +1,4 @@
-export type DayType = 'PTO' | 'PLANNING' | 'SUPPORT';
+export type DayType = 'PTO' | 'PLANNING' | 'SUPPORT' | 'MISSED';
 
 export interface EntryOverview {
   date: string;
@@ -40,6 +40,7 @@ export interface TodoSummary {
 export interface HeatMapEntry {
   entryDate: string;
   wordCount: number;
+  dayType: DayType | null;
 }
 
 export interface HeatMapResponse {

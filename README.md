@@ -20,7 +20,7 @@ The frontend for [Standbase](https://standbase.shivankkapoor.com), a personal st
 
 ## Features
 
-- Monthly calendar view with colour-coded day types (PTO, Planning, Support) and a per-day todo
+- Monthly calendar view with colour-coded day types (PTO, Planning, Support, Missed) and a per-day todo
   completion indicator
 - Inline side panel on desktop; bottom drawer on mobile
 - Full-page entry editor at `/entry/:date` with unsaved-changes prompt and Ctrl/Cmd+S to save

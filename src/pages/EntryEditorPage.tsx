@@ -139,6 +139,7 @@ export function EntryEditorPage() {
                   <SelectItem value="PTO"><DayTypeBadge dayType="PTO" /></SelectItem>
                   <SelectItem value="PLANNING"><DayTypeBadge dayType="PLANNING" /></SelectItem>
                   <SelectItem value="SUPPORT"><DayTypeBadge dayType="SUPPORT" /></SelectItem>
+                  <SelectItem value="MISSED"><DayTypeBadge dayType="MISSED" /></SelectItem>
                 </SelectContent>
               </Select>
             </div>
