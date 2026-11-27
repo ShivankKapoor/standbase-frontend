@@ -4,7 +4,7 @@ const dotColour: Record<DayType, string> = {
   PTO:      'bg-green-500',
   PLANNING: 'bg-pink-400',
   SUPPORT:  'bg-yellow-400',
-  MISSED:   'bg-red-500',
+  MISSED:   'bg-slate-400',
 };
 
 interface DayCellProps {

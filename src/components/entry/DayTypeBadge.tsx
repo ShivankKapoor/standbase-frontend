@@ -4,14 +4,14 @@ const styles: Record<DayType, string> = {
   PTO:      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   PLANNING: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
   SUPPORT:  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  MISSED:   'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  MISSED:   'bg-slate-200 text-slate-700 dark:bg-slate-700/40 dark:text-slate-300',
 };
 
 const dotStyles: Record<DayType, string> = {
   PTO:      'bg-green-500',
   PLANNING: 'bg-pink-400',
   SUPPORT:  'bg-yellow-400',
-  MISSED:   'bg-red-500',
+  MISSED:   'bg-slate-400',
 };
 
 export function DayTypeBadge({ dayType }: { dayType: DayType }) {
