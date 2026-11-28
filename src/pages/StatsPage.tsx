@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { format, parseISO } from 'date-fns';
 import { Header } from '../components/layout/Header';
+import { CreditUsageCard } from '../components/stats/CreditUsageCard';
 import { HeatmapCalendar } from '../components/stats/HeatmapCalendar';
 import { StatTile } from '../components/stats/StatTile';
 import { StreakCard } from '../components/stats/StreakCard';
@@ -70,6 +71,10 @@ export function StatsPage() {
             </div>
           </div>
         )}
+
+        <div className="mt-4">
+          <CreditUsageCard today={today} />
+        </div>
       </main>
     </div>
   );

@@ -29,6 +29,8 @@ The frontend for [Standbase](https://standbase.shivankkapoor.com), a personal st
   `localStorage`
 - Todos per day: add, edit, complete, cancel, delete, drag to reorder, and move to the previous
   day, next day, or a chosen date via the right-click menu (full-page editor at `/todos/:date`)
+- AI credits: enter the month-to-date total in a day's panel (or mark a weekday "Didn't work");
+  the stats page shows the month's usage, average per worked day and a daily chart
 - Statistics page at `/stats`: a one-year writing heatmap, average/longest/total words, this
   week's average, busiest weekday, and current and longest weekday streaks (weekends don't break
   a streak)
@@ -87,14 +89,15 @@ src/
 │   ├── entries.ts       # getEntries(), getEntry(), createEntry(), deleteEntry()
 │   ├── todos.ts         # getTodos(), createTodo(), updateTodo(), deleteTodo(),
 │   │                    # reorderTodos(), getTodoSummary()
-│   └── heatmap.ts       # getHeatMap()
+│   ├── heatmap.ts       # getHeatMap()
+│   └── credits.ts       # getCreditMonth(), saveCreditDay()
 ├── components/
 │   ├── ui/              # shadcn/ui components — do not edit manually
 │   ├── layout/          # Header, ThemeToggle
 │   ├── auth/            # LoginForm, TotpForm
 │   ├── calendar/        # MonthCalendar, DayCell
-│   ├── entry/           # EntryPanel, DayTypeBadge, TodoList
-│   └── stats/           # HeatmapCalendar, StatTile, StreakCard
+│   ├── entry/           # EntryPanel, DayTypeBadge, TodoList, CreditField
+│   └── stats/           # HeatmapCalendar, StatTile, StreakCard, CreditUsageCard
 ├── context/
 │   └── AuthContext.tsx  # Token + username in state and localStorage
 ├── hooks/
@@ -105,6 +108,7 @@ src/
 │   ├── useHeatMap.ts       # One-year word-count history
 │   └── useIsMobile.ts      # window.matchMedia hook (breakpoint 768px)
 ├── lib/
+│   ├── credits.ts       # Credit number formatting
 │   ├── heatmap.ts       # Heatmap layout, quartile buckets, streak and stat calculations
 │   └── utils.ts         # cn() class helper
 ├── pages/
@@ -116,7 +120,7 @@ src/
 │   └── StatsPage.tsx        # Heatmap and stats at /stats
 ├── types/
 │   └── index.ts         # Entry, DayType, Todo, TodoSummary, HeatMapResponse, LoginResult,
-│                        # SessionCheck
+│                        # SessionCheck, CreditDay, CreditMonth
 └── index.css            # Tailwind directives, theme tokens, custom keyframes
 ```
 

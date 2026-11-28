@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
 import { DayTypeBadge } from './DayTypeBadge';
 import { TodoList } from './TodoList';
+import { CreditField } from './CreditField';
 import { getEntry, createEntry, deleteEntry } from '../../api/entries';
 import { useTodos } from '../../hooks/useTodos';
 import { formatTalkingTime } from '../../lib/utils';
@@ -234,6 +235,8 @@ export function EntryPanel({ date, onClose, onSave, onDelete, onTodosChange, onM
               onMove={async (id, targetDate) => { await moveTodo(id, targetDate); onMoveComplete?.(); }}
               onExpand={() => navigate(`/todos/${date}`)}
             />
+
+            <CreditField key={date} date={date} />
           </>
         )}
       </div>
