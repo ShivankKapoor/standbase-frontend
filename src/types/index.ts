@@ -48,3 +48,18 @@ export interface HeatMapResponse {
   average: number;
   entries: HeatMapEntry[];
 }
+
+export interface CreditDay {
+  date: string;
+  monthTotal: number | null;
+  didNotWork: boolean;
+  /** Credits used since the previous logged total; null when no total was logged. */
+  used: number | null;
+}
+
+export interface CreditMonth {
+  used: number;
+  workedDays: number;
+  average: number | null;
+  days: CreditDay[];
+}
